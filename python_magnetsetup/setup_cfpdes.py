@@ -193,7 +193,7 @@ def json_cfpdes(args, confdata, yamlfile, magnetsetup, default_path, cwd):
     for i in range(1,NRings+1):
         part_withoutAir.append("R{}".format(i))
 
-    boundary_Ring = [] # list of name of boundaries of Ring for elastic part
+    boundary_Ring = [ "H1_HP", "H_HP" ] # list of name of boundaries of Ring for elastic part
     for i in range(1,NRings+1):
         if i % 2 == 1 :
             boundary_Ring.append("R{}_BP".format(i))
@@ -237,7 +237,7 @@ def json_cfpdes(args, confdata, yamlfile, magnetsetup, default_path, cwd):
         copyfile(src, dst)
     
     with open(fmodel, "r") as ftemplate:
-        jsonfile = chevron.render(ftemplate, {'index_h': index_H, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1, 'part_withoutAir':part_withoutAir })
+        jsonfile = chevron.render(ftemplate, {'index_h': index_H, 'index_conductor':index_conductor, 'imin': 0, 'imax': NHelices+1, 'part_withoutAir':part_withoutAir, 'boundary_Ring':boundary_Ring })
         jsonfile = jsonfile.replace("\'", "\"")
         # shall get rid of comments: //*
         # now tweak obtained json
