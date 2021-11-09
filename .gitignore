@@ -104,4 +104,6 @@ ENV/
 # IDE settings
 .vscode/
 
-/test
+*.msh
+*.brep
+*.xao
