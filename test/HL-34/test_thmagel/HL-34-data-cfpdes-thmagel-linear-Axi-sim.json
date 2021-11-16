@@ -700,9 +700,9 @@
             "Dirichlet": {
                 "H1_Fixed": {
                     "markers": [
-                        "R1_BP",
                         "H1_HP",
-                        "H_HP"
+                        "H_HP",
+                        "R1_BP"
                     ],
                     "expr": "{0,0}"
                 }

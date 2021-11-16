@@ -1,0 +1,152 @@
+{
+    "Name": "Fully coupled 3D Stationnary model",
+    "ShortName": "Full3DStat",
+    "Models": {
+        "equation": "hdg"
+    },
+    "Parameters": {
+        "Tinit": 293,
+        "h": 58222.1,
+        "Tw": 290.671,
+        "dTw": 12.74,
+        "h0": "h:h",
+        "Tw0": "Tw:Tw",
+        "dTw0": "dTw:dTw",
+        "Zmin0": -0.226,
+        "Zmax0": 0.108,
+        "Sh0": 0.09034717816899689,
+        "Dh0": 0.0015200000000000031,
+        "h1": "h:h",
+        "Tw1": "Tw:Tw",
+        "dTw1": "dTw:dTw",
+        "Zmin1": -0.226,
+        "Zmax1": 0.108,
+        "Sh1": 0.8090229401524438,
+        "Dh1": 0.011600000000000001,
+        "h2": "h:h",
+        "Tw2": "Tw:Tw",
+        "dTw2": "dTw:dTw",
+        "Zmin2": -0.108,
+        "Zmax2": 0.108,
+        "Sh2": 106.99966912222908,
+        "Dh2": 0.32230000000000003
+    },
+    "Materials": {
+        "Air": {
+            "physics": "electric",
+            "magnetic_c": "x/mu0:x:mu0",
+            "magnetic_beta": "{2/mu0,0}:mu0"
+        },
+        "H1": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "360.0",
+            "k": "k0:k0"
+        },
+        "H2": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "360.0",
+            "k": "k0:k0"
+        },
+        "R1": {
+            "alpha": "0.0036",
+            "sigma0": "50100000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "360.0",
+            "k": "k0:k0"
+        }
+    },
+    "InitialConditions": {
+        "temperature": {
+            "Expression": {
+                "myic": {
+                    "markers": [
+                        "H1_Cu0",
+                        "H1_Cu1",
+                        "H1_Cu2",
+                        "H1_Cu3",
+                        "H1_Cu4",
+                        "H1_Cu5",
+                        "H1_Cu6",
+                        "H1_Cu7",
+                        "H1_Cu8",
+                        "H1_Cu9",
+                        "H1_Cu10",
+                        "H1_Cu11",
+                        "H1_Cu12",
+                        "H1_Cu13",
+                        "H1_Cu14",
+                        "H1_Cu15",
+                        "H1_Cu16",
+                        "H1_Cu17",
+                        "H1_Cu18",
+                        "H1_Cu19",
+                        "H1_Cu20",
+                        "H1_Cu21",
+                        "H2_Cu0",
+                        "H2_Cu1",
+                        "H2_Cu2",
+                        "H2_Cu3",
+                        "H2_Cu4",
+                        "H2_Cu5",
+                        "H2_Cu6",
+                        "H2_Cu7",
+                        "H2_Cu8",
+                        "H2_Cu9",
+                        "H2_Cu10",
+                        "H2_Cu11",
+                        "H2_Cu12",
+                        "H2_Cu13",
+                        "H2_Cu14",
+                        "H2_Cu15",
+                        "H2_Cu16",
+                        "H2_Cu17",
+                        "H2_Cu18",
+                        "H2_Cu19",
+                        "H2_Cu20",
+                        "H2_Cu21",
+                        "R1"
+                    ],
+                    "expr": "Tinit:Tinit"
+                }
+            }
+        }
+    },
+    "BoundaryConditions": {
+        "electric-potential": {
+            "Dirichlet": {}
+        },
+        "temperature": {
+            "Robin": {
+                "Channel0": {
+                    "expr1": "h0:h0",
+                    "expr2": "h0*(Tw0+dTw0):h0:Tw0:dTw0"
+                },
+                "Channel1": {
+                    "expr1": "h1:h1",
+                    "expr2": "h1*(Tw1+dTw1):h1:Tw1:dTw1"
+                },
+                "Channel2": {
+                    "expr1": "h2:h2",
+                    "expr2": "h2*(Tw2+dTw2):h2:Tw2:dTw2"
+                }
+            }
+        }
+    },
+    "PostProcess": {
+        "use-model-name": 1,
+        "electric": {
+            "Exports": {
+                "fields": "all"
+            }
+        },
+        "heat": {
+            "Exports": {
+                "fields": "all"
+            }
+        }
+    }
+}
