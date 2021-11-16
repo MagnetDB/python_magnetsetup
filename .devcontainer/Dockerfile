@@ -49,15 +49,15 @@ RUN apt-get update \
     && apt-get -y install curl \
     && apt-get -y install python3-requests \
     && pip install chevron \
-    && apt-get install python3-python-magnetgeo \
-    && apt-get install python3-gmsh \
+    && apt-get -y install python3-python-magnetgeo \
+    && apt-get -y install python3-gmsh \
     #\
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.\
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
     # [Optional] Add sudo support for the non-root user
     && apt-get install -y sudo \
-    && if [ "$(lsb_release -cs)" = "focal" ]; then echo "Set disable_coredump false" > /etc/sudo.conf; fi \
+    #&& if [ "$(lsb_release -cs)" = "focal" ]; then echo "Set disable_coredump false" > /etc/sudo.conf; fi \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     # add github ssh key

@@ -105,5 +105,6 @@ ENV/
 .vscode/
 
 *.msh
-*.brep
 *.xao
+*.brep
+*~
