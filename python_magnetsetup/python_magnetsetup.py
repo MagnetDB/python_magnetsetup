@@ -141,7 +141,7 @@ def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
     
     return params_dict
 
-def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, NHelices, Nsections, NRings):
+def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, fconductorbis, NHelices, Nsections, NRings):
     """
     Return materials_dict, the dictionnary of section \"Materials\" for JSON file for cfpdes method.
     """
@@ -166,8 +166,8 @@ def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, fin
 
     for i in range(NHelices):
         
-        # section j==0:  treated as insulator in Axi
-        with open(finsulator, "r") as ftemplate:
+        # section j==0:  treated as conductor without current in Axi
+        with open(fconductorbis, "r") as ftemplate:
             jsonfile = chevron.render(ftemplate, Merge({'name': "H%d_Cu%d" % (i+1, 0)}, confdata["Helix"][i]["material"]))
             jsonfile = jsonfile.replace("\'", "\"")
             # shall get rid of comments: //*
@@ -183,8 +183,8 @@ def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, fin
                 mdata = json.loads(jsonfile)
                 materials_dict["H%d_Cu%d" % (i+1, j)] = mdata["H%d_Cu%d" % (i+1, j)]
 
-        # section j==Nsections+1:  treated as insulator in Axi
-        with open(finsulator, "r") as ftemplate:
+        # section j==Nsections+1:  treated as conductor without current in Axi
+        with open(fconductorbis, "r") as ftemplate:
             jsonfile = chevron.render(ftemplate, Merge({'name': "H%d_Cu%d" % (i+1, Nsections[i]+1)}, confdata["Helix"][i]["material"]))
             jsonfile = jsonfile.replace("\'", "\"")
             # shall get rid of comments: //*
@@ -359,8 +359,12 @@ def main():
     json_model = magnetsetup[args.method][args.time][args.geom][args.model]["model"]
     if args.phytype == 'linear':
         conductor_model = magnetsetup[args.method][args.time][args.geom][args.model]["conductor-linear"]
+        if args.geom == 'Axi':
+            conductorbis_model = magnetsetup[args.method][args.time][args.geom][args.model]["insulator"]
     elif args.phytype == 'nonlinear':
         conductor_model = magnetsetup[args.method][args.time][args.geom][args.model]["conductor-nonlinear"]
+        if args.geom == 'Axi':
+            conductorbis_model = magnetsetup[args.method][args.time][args.geom][args.model]["conductorbis-nonlinear"]
     insulator_model = magnetsetup[args.method][args.time][args.geom][args.model]["insulator"]
     if args.model != 'mag':
         cooling_model = magnetsetup[args.method][args.time][args.geom][args.model]["cooling"][args.cooling]
@@ -370,6 +374,8 @@ def main():
     template_path = os.path.join(default_path, "templates", args.method, args.geom)
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
+    if args.geom == 'Axi':
+        fconductorbis = os.path.join(template_path, conductorbis_model)
     finsulator = os.path.join(template_path, insulator_model)
     if args.model != 'mag':
         fcooling = os.path.join(template_path, cooling_model)
@@ -390,7 +396,7 @@ def main():
 
         # Fill materials (Axi specific)
         if args.method == 'cfpdes':
-            materials_dict = create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, NHelices, Nsections, NRings)
+            materials_dict = create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, fconductorbis, NHelices, Nsections, NRings)
         elif args.method == 'HDG':
             materials_dict = create_materials_hdg(confdata, finsulator, fconductor, NHelices, NRings)
         

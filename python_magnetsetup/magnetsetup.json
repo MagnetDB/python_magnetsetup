@@ -33,7 +33,7 @@
 				{
 					"model":"mag.mustache",
 					"conductor-linear": "material-conductor-linear-static-mag.mustache",
-					"conductorbis-linear": "material-conductor-linear-static-mag.mustache",
+					"conductorbis-linear": "material-conductorbis-linear-static-mag.mustache",
 					"insulator": "material-insulator-static-mag.mustache",
 					"filename":
 					{
@@ -47,8 +47,8 @@
 					"model": "thmag.mustache",
 					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
 					"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
-					"conductorbis-linear": "material-conductor-linear-static-thmag.mustache",
-					"conductorbis-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
+					"conductorbis-linear": "material-conductorbis-linear-static-thmag.mustache",
+					"conductorbis-nonlinear": "material-conductorbis-nonlinear-static-thmag.mustache",
 					"insulator": "material-insulator-static-thmag.mustache",
 					"cooling":
 					{
@@ -71,8 +71,8 @@
 					"model" : "thmagel.mustache",
 					"conductor-linear": "material-conductor-linear-static-thmagel.mustache",
 					"conductor-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
-					"conductorbis-linear": "material-conductor-linear-static-thmagel.mustache",
-					"conductorbis-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
+					"conductorbis-linear": "material-conductorbis-linear-static-thmagel.mustache",
+					"conductorbis-nonlinear": "material-conductorbis-nonlinear-static-thmagel.mustache",
 					"insulator": "material-insulator-static-thmagel.mustache",
 					"cooling":
 					{
