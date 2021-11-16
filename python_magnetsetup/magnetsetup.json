@@ -1,161 +1,185 @@
 {
     "cfpdes":
     {
-	"static":
-	{
-	    "Axi":
-	    {
-		"th":
+		"static":
 		{
-			"model": "th.mustache",
-			"conductor-linear": "material-conductor-linear-static-th.mustache",
-			"conductor-nonlinear": "material-conductor-nonlinear-static-th.mustache",
-			"insulator": "material-insulator-static-th.mustache",
-			"cooling":
-		    {
-				"mean": "channel-mean.mustache",
-				"grad": "channel-grad.mustache"
-		    },
-		    "cooling-post":
-		    {
-				"mean": "flux-channel-mean.mustache",
-				"grad": "flux-channel-grad.mustache"
-		    },
-		    "filename":
-		    {
-				"conductor": "material-conductor-static-th.json",
-				"insulator": "material-insulator-static-th.json"
-		    }
-		},
-		"mag":
-		{
-			"model":"mag.mustache",
-			"conductor-linear": "material-conductor-linear-static-mag.mustache",
-			"insulator": "material-insulator-static-mag.mustache",
-		    "filename":
-		    {
-				"conductor": "material-conductor-static-mag.json",
-				"insulator": "material-insulator-static-mag.json"
-		    }
-			
-		},
-		"thmag":
-		{
-			"model": "thmag.mustache",
-			"conductor-linear": "material-conductor-linear-static-thmag.mustache",
-			"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
-			"insulator": "material-insulator-static-thmag.mustache",
-		    "cooling":
-		    {
-				"mean": "channel-mean.mustache",
-				"grad": "channel-grad.mustache"
-		    },
-		    "cooling-post":
-		    {
-				"mean": "flux-channel-mean.mustache",
-				"grad": "flux-channel-grad.mustache"
-		    },
-			"filename":
+			"Axi":
 			{
-				"conductor": "material-conductor-static-thmag.json",
-				"insulator": "material-insulator-static-thmag.json"
+				"th":
+				{
+					"model": "th.mustache",
+					"conductor-linear": "material-conductor-linear-static-th.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-th.mustache",
+					"conductorbis-linear": "material-conductorbis-linear-static-th.mustache",
+					"conductorbis-nonlinear": "material-conductorbis-nonlinear-static-th.mustache",
+					"insulator": "material-insulator-static-th.mustache",
+					"cooling":
+					{
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache"
+					},
+					"filename":
+					{
+						"conductor": "material-conductor-static-th.json",
+						"insulator": "material-insulator-static-th.json"
+					}
+				},
+				"mag":
+				{
+					"model":"mag.mustache",
+					"conductor-linear": "material-conductor-linear-static-mag.mustache",
+					"conductorbis-linear": "material-conductor-linear-static-mag.mustache",
+					"insulator": "material-insulator-static-mag.mustache",
+					"filename":
+					{
+						"conductor": "material-conductor-static-mag.json",
+						"insulator": "material-insulator-static-mag.json"
+					}
+					
+				},
+				"thmag":
+				{
+					"model": "thmag.mustache",
+					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
+					"conductorbis-linear": "material-conductor-linear-static-thmag.mustache",
+					"conductorbis-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
+					"insulator": "material-insulator-static-thmag.mustache",
+					"cooling":
+					{
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache"
+					},
+					"filename":
+					{
+						"conductor": "material-conductor-static-thmag.json",
+						"insulator": "material-insulator-static-thmag.json"
+					}
+				},
+				"thmagel":
+				{
+					"model" : "thmagel.mustache",
+					"conductor-linear": "material-conductor-linear-static-thmagel.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
+					"conductorbis-linear": "material-conductor-linear-static-thmagel.mustache",
+					"conductorbis-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
+					"insulator": "material-insulator-static-thmagel.mustache",
+					"cooling":
+					{
+					"mean": "channel-mean.mustache",
+					"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+					"mean": "flux-channel-mean.mustache",
+					"grad": "flux-channel-grad.mustache"
+					},
+					"filename":
+					{
+					"conductor": "material-conductor-static-thmagel.json",
+					"insulator": "material-insulator-static-thmagel.json"
+					}
+				}
+			},
+			"3D":
+			{
+				"th":
+				{
+				},
+				"thmag":
+				{
+				},
+				"thmagel":
+				{
+				}
 			}
 		},
-		"thmagel":
+		"transient":	
 		{
-		    "model" : "thmagel.mustache",
-		    "conductor-linear": "material-conductor-linear-static-thmagel.mustache",
-			"conductor-nonlinear": "material-conductor-nonlinear-static-thmagel.mustache",
-		    "insulator": "material-insulator-static-thmagel.mustache",
-		    "cooling":
-		    {
-			"mean": "channel-mean.mustache",
-			"grad": "channel-grad.mustache"
-		    },
-		    "cooling-post":
-		    {
-			"mean": "flux-channel-mean.mustache",
-			"grad": "flux-channel-grad.mustache"
-		    },
-		    "filename":
-		    {
-			"conductor": "material-conductor-static-thmagel.json",
-			"insulator": "material-insulator-static-thmagel.json"
-		    }
+			"Axi":
+			{
+				"th":
+				{
+				},
+				"mqs":
+				{
+				},
+				"thmqs":
+				{
+				}
+			},
+			"3D":
+			{
+				"th":
+				{
+				},
+				"mqs":
+				{
+				},
+				"thmqs":
+				{
+				}
+			}
 		}
-	    },
-	    "3D":
-	    {
-		"th":
-		{
-		},
-		"thmag":
-		{
-		},
-		"thmagel":
-		{
-		}
-	    }
 	},
-	"transient":	
+	"CG":
 	{
-	    "Axi":
-	    {
-		"th":
+		"static":
 		{
+			"3D":
+			{
+			}
 		},
-		"mqs":
+		"transient":	
 		{
-		},
-		"thmqs":
-		{
+			"3D":
+			{
+			}
 		}
-	    },
-	    "3D":
-	    {
-		"th":
+	},
+	"HDG":
+	{
+		"static":
 		{
+			"3D":
+			{
+				"thmag": 
+				{
+					"model": "thmag.mustache",
+					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
+					"insulator": "material-insulator-static-thmag.mustache",
+					"cooling":
+					{
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache"
+					}
+				}
+			}
 		},
-		"mqs":
+		"transient":	
 		{
-		},
-		"thmqs":
-		{
+			"3D":
+			{
+			}
 		}
-	    }
-	}
-    },
-    "CG":
-    {
-	"static":
-	{
-	    "3D":
-	    {
-	    }
 	},
-	"transient":	
+	"CRB":
 	{
-	    "3D":
-	    {
-	    }
 	}
-    },
-    "HDG":
-    {
-	"static":
-	{
-	    "3D":
-	    {
-	    }
-	},
-	"transient":	
-	{
-	    "3D":
-	    {
-	    }
-	}
-    },
-    "CRB":
-    {
-    }
 }
