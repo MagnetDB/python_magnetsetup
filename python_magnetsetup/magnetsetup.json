@@ -138,6 +138,23 @@
 		{
 			"3D":
 			{
+				"th":
+				{
+					"model": "th.mustache",
+					"conductor-linear": "material-conductor-linear-static-th.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-th.mustache",
+					"insulator": "material-insulator-static-th.mustache",
+					"cooling":
+					{
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache"
+					}
+				}
 			}
 		},
 		"transient":	
@@ -153,7 +170,7 @@
 		{
 			"3D":
 			{
-				"thmag": 
+				"th": 
 				{
 					"model": "thmag.mustache",
 					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
