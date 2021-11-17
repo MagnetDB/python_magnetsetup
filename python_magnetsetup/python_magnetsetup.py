@@ -381,8 +381,8 @@ def main():
         print("You can't enter datafile and magnet together.")
         exit(1)
 
-    if ( args.method == "HDG"):
-        args.model = 'thmag'
+    if ( args.method == "HDG" ) and ( args.method == "CG" ):
+        args.model = 'th'
         args.geom = '3D'
 
     # Get current dir
