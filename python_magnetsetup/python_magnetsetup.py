@@ -77,15 +77,25 @@ def create_indices(NHelices, Nsections):
     
     return index_H, index_conductor, index_Helices, index_HelicesConductor
 
-def create_part_withoutAir(NHelices, Nsections, NRings):
+def create_part_withoutAir(args, NHelices, Nsections, NRings):
     "Return all Markers name except the Air"
 
     part_withoutAir = []  # list of name of all parts without Air
-    for i in range(NHelices):
-        for j in range(Nsections[i]+2):
-            part_withoutAir.append("H{}_Cu{}".format(i+1,j))
-    for i in range(1,NRings+1):
-        part_withoutAir.append("R{}".format(i))
+
+    if args.geom == '3D':
+        for i in range(NHelices):
+            part_withoutAir.append("H{}_Cu".format(i+1))
+        for i in range(1,NRings+1):
+            part_withoutAir.append("R{}".format(i))
+        part_withoutAir.append('iL1')
+        part_withoutAir.append('oL2')
+
+    elif args.geom == 'Axi':
+        for i in range(NHelices):
+            for j in range(Nsections[i]+2):
+                part_withoutAir.append("H{}_Cu{}".format(i+1,j))
+        for i in range(1,NRings+1):
+            part_withoutAir.append("R{}".format(i))
     
     return part_withoutAir
 
@@ -100,6 +110,57 @@ def create_boundary_Ring(NRings):
             boundary_Ring.append("R{}_HP".format(i))
     
     return boundary_Ring
+
+def create_boundary_withoutV(NHelices, NRings, NChannels):
+    "Return all boundar's markers except the markers of tension"
+
+    boundary_withoutV = []
+
+    for i in range(NHelices):
+        boundary_withoutV.append("H{}_Interface0".format(i+1))
+        boundary_withoutV.append("H{}_Interface1".format(i+1))
+
+    for i in range(NRings):
+        if i % 2 == 0 : boundary_withoutV.append("R{}_HP".format(i+1))
+        if i % 2 == 1 : boundary_withoutV.append("R{}_BP".format(i+1))
+
+    for i in range(NChannels):
+        boundary_withoutV.append("Channel{}".format(i))
+
+    boundary_withoutV.append("Inner1_R0n")
+    boundary_withoutV.append("Inner1_R1n")
+    boundary_withoutV.append("Inner1_FixingHoles")
+    boundary_withoutV.append("OuterL2_R0n")
+    boundary_withoutV.append("OuterL2_R1n")
+    boundary_withoutV.append("OuterL2_CooledSurfaces")
+    boundary_withoutV.append("OuterL2_Others")
+
+    return boundary_withoutV
+
+def create_boundary_withoutChannels(NHelices, NRings):
+    "Return all boundar's markers except the markers of Channels"
+
+    boundary_withoutChannels = []
+
+    for i in range(NHelices):
+        boundary_withoutChannels.append("H{}_Interface0".format(i+1))
+        boundary_withoutChannels.append("H{}_Interface1".format(i+1))
+
+    for i in range(NRings):
+        if i % 2 == 0 : boundary_withoutChannels.append("R{}_HP".format(i+1))
+        if i % 2 == 1 : boundary_withoutChannels.append("R{}_BP".format(i+1))
+
+    boundary_withoutChannels.append("Inner1_R0n")
+    boundary_withoutChannels.append("Inner1_R1n")
+    boundary_withoutChannels.append("Inner1_LV0")
+    boundary_withoutChannels.append("Inner1_FixingHoles")
+    boundary_withoutChannels.append("OuterL2_R0n")
+    boundary_withoutChannels.append("OuterL2_R1n")
+    boundary_withoutChannels.append("OuterL2_LV0")
+    boundary_withoutChannels.append("OuterL2_CooledSurfaces")
+    boundary_withoutChannels.append("OuterL2_Others")
+
+    return boundary_withoutChannels
 
 def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
     """
@@ -230,11 +291,11 @@ def create_materials_hdg(confdata, finsulator, fconductor, NHelices, NRings):
     # loop for Helices
     for i in range(NHelices):
         with open(fconductor, "r") as ftemplate:
-            jsonfile = chevron.render(ftemplate, Merge({'name': "H%d" % (i+1)}, confdata["Helix"][i]["material"]))
+            jsonfile = chevron.render(ftemplate, Merge({'name': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]))
             jsonfile = jsonfile.replace("\'", "\"")
             # shall get rid of comments: //*
             mdata = json.loads(jsonfile)
-            materials_dict["H%d" % (i+1)] = mdata["H%d" % (i+1)]
+            materials_dict["H%d_Cu" % (i+1)] = mdata["H%d_Cu" % (i+1)]
 
     # loop for Rings
     for i in range(NRings):
@@ -245,9 +306,26 @@ def create_materials_hdg(confdata, finsulator, fconductor, NHelices, NRings):
             mdata = json.loads(jsonfile)
             materials_dict["R%d" % (i+1)] = mdata["R%d" % (i+1)]
 
+    # Leads
+    # inner
+    with open(fconductor, "r") as ftemplate:
+        jsonfile = chevron.render(ftemplate, Merge({'name': "iL1"}, confdata["Lead"][0]["material"]))
+        jsonfile = jsonfile.replace("\'", "\"")
+        # shall get rid of comments: //*
+        mdata = json.loads(jsonfile)
+        materials_dict["iL1"] = mdata["iL1"]
+
+    # outer
+    with open(fconductor, "r") as ftemplate:
+        jsonfile = chevron.render(ftemplate, Merge({'name': "oL2"}, confdata["Lead"][1]["material"]))
+        jsonfile = jsonfile.replace("\'", "\"")
+        # shall get rid of comments: //*
+        mdata = json.loads(jsonfile)
+        materials_dict["oL2"] = mdata["oL2"]
+
     return materials_dict
 
-def create_bcs_dict(NChannels, fcooling):
+def create_bcsFlux_dict(NChannels, fcooling):
     """
     Return bcs_dict, the dictionnary of section \"BoundaryConditions\" for JSON file especially for cooling.
     """
@@ -351,8 +429,10 @@ def main():
 
     # Create indices and marker's names
     index_H, index_conductor, index_Helices, index_HelicesConductor = create_indices(NHelices, Nsections)
-    part_withoutAir = create_part_withoutAir(NHelices, Nsections, NRings)
+    part_withoutAir = create_part_withoutAir(args, NHelices, Nsections, NRings)
     boundary_Ring = create_boundary_Ring(NRings)
+    boundary_withoutV = create_boundary_withoutV(NHelices, NRings, NChannels)
+    boundary_withoutChannels = create_boundary_withoutChannels(NHelices, NRings)
 
     # load mustache template file
     # cfg_model  = magnetsetup[args.method][args.time][args.geom][args.model]["cfg"]
@@ -407,9 +487,14 @@ def main():
         # Cooling BCs
         if args.model != 'mag':
             if args.method == 'cfpdes':
-                data["BoundaryConditions"]["heat"]["Robin"] = create_bcs_dict(NChannels, fcooling)
+                data["BoundaryConditions"]["heat"]["Robin"] = create_bcsFlux_dict(NChannels, fcooling)
             elif args.method == 'HDG':
-                data["BoundaryConditions"]["temperature"]["Robin"] = create_bcs_dict(NChannels, fcooling)
+                data["BoundaryConditions"]["temperature"]["Robin"] = create_bcsFlux_dict(NChannels, fcooling)
+
+        # HDG case
+        if args.method == 'HDG':
+            data["BoundaryConditions"]["electric-potential"]["Neumann"] = { "myneumannelec" : { "markers":boundary_withoutV, "expr":0 } }
+            data["BoundaryConditions"]["temperature"]["Neumann"] = { "myneumannheat" : { "markers":boundary_withoutChannels, "expr":0 } }
 
         # Fill PostProcess
         # Flux
