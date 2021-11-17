@@ -1,21 +1,12 @@
 {
     "Name": "Fully coupled 3D Stationnary model",
     "ShortName":"Full3DStat",
-    "Models":
-    {
-        "equation":"hdg"
-    },
+    "Models":"hdg",
     "Parameters":
     {
     },
     "Materials":
     {
-		"Air":
-		{
-	    	"physics":"electric",
-	    	"magnetic_c":"x/mu0:x:mu0",
-	    	"magnetic_beta":"{2/mu0,0}:mu0"
-		}
     },
     "InitialConditions":
     {
@@ -25,7 +16,6 @@
             {
                 "myic":
                 {
-                    "markers": {{part_withoutAir}},
                     "expr":"Tinit:Tinit"
                 }
             }
@@ -37,21 +27,27 @@
         {
             "Dirichlet":
             {
-                "V1":
+                "Inner1_LV0":
                 {
-                    "expr":"100"
+                    "expr":"9"
                 },
-                "V0":
+                "OuterL2_LV0":
                 {
                     "expr":"0"
                 }
+            },
+            "Neumann":
+            {
             }
         },
 		"temperature":
 		{
 			"Robin":
 			{
-			}
+			},
+            "Neumann":
+            {
+            }
 		}
     },
     "PostProcess":
