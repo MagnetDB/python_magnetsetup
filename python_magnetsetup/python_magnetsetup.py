@@ -382,7 +382,7 @@ def main():
         exit(1)
 
     if ( args.method == "HDG"):
-        args.model = 'thmag'
+        args.model = 'th'
         args.geom = '3D'
 
     # Get current dir

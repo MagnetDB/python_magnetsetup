@@ -153,12 +153,12 @@
 		{
 			"3D":
 			{
-				"thmag": 
+				"th": 
 				{
 					"model": "thmag.mustache",
-					"conductor-linear": "material-conductor-linear-static-thmag.mustache",
-					"conductor-nonlinear": "material-conductor-nonlinear-static-thmag.mustache",
-					"insulator": "material-insulator-static-thmag.mustache",
+					"conductor-linear": "material-conductor-linear-static-th.mustache",
+					"conductor-nonlinear": "material-conductor-nonlinear-static-th.mustache",
+					"insulator": "material-insulator-static-th.mustache",
 					"cooling":
 					{
 						"mean": "channel-mean.mustache",
