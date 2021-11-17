@@ -1,9 +1,7 @@
 {
     "Name": "Fully coupled 3D Stationnary model",
     "ShortName": "Full3DStat",
-    "Models": {
-        "equation": "hdg"
-    },
+    "Models": "hdg",
     "Parameters": {
         "Tinit": 293,
         "h": 58222.1,
@@ -38,21 +36,18 @@
             "magnetic_beta": "{2/mu0,0}:mu0"
         },
         "H1": {
-            "alpha": "0.0036",
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "k0": "360.0",
             "k": "k0:k0"
         },
         "H2": {
-            "alpha": "0.0036",
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "k0": "360.0",
             "k": "k0:k0"
         },
         "R1": {
-            "alpha": "0.0036",
             "sigma0": "50100000.0",
             "sigma": "sigma0:sigma0",
             "k0": "360.0",
@@ -117,7 +112,15 @@
     },
     "BoundaryConditions": {
         "electric-potential": {
-            "Dirichlet": {}
+            "Dirichlet": {
+                "V1": {
+                    "expr": "9"
+                },
+                "V0": {
+                    "expr": "0"
+                }
+            },
+            "Neumann": {}
         },
         "temperature": {
             "Robin": {
@@ -133,7 +136,8 @@
                     "expr1": "h2:h2",
                     "expr2": "h2*(Tw2+dTw2):h2:Tw2:dTw2"
                 }
-            }
+            },
+            "Neumann": {}
         }
     },
     "PostProcess": {
