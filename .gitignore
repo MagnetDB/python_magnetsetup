@@ -108,3 +108,5 @@ ENV/
 *.xao
 *.brep
 *~
+
+test.py
