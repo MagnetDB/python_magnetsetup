@@ -2,8 +2,9 @@
     "Name": "Fully coupled 3D Stationnary model",
     "ShortName": "Full3DStat",
     "Parameters": {
-        "mu0": 1.2566370614359174e-09,
+        "mu0": 0.001,
         "Tinit": 293,
+        "Tin": 284.15,
         "h0": 0.0582221,
         "Tw0": 290.671,
         "dTw0": 12.74,
