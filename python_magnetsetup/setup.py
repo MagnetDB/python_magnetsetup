@@ -133,11 +133,11 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
         "model": fmodel,
         "conductor": fconductor,
         "insulator": finsulator,
-        "cooling": fcooling,
-        "flux": fflux,
-        "stats": [fstats_T, fstats_Power],
         "material_def" : material_generic_def
     }
+
+    if model != 'mag':
+        dict = merge(dict, {"cooling": fcooling, "flux": fflux, "stats": [fstats_T, fstats_Power] })
 
     if check_templates(dict):
         pass
@@ -393,7 +393,8 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
     return materials_dict
 
 
-def create_bcs(boundary_meca: List, 
+def create_bcs(args,
+               boundary_meca: List, 
                boundary_maxwell: List,
                boundary_electric: List,
                gdata: tuple, confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
@@ -407,12 +408,14 @@ def create_bcs(boundary_meca: List,
     maxwell_bcs_dir = { 'boundary_Maxwell_Dir': []} # name, value
     
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
-    fcooling = templates["cooling"]
     
-    for i in range(NChannels):
-        # load insulator template for j==0
-        mdata = entry(fcooling, {'i': i}, debug)
-        thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": "Channel%d" % i}, mdata["Channel%d" % i]) )
+    if args.model != 'mag':
+        fcooling = templates["cooling"]
+    
+        for i in range(NChannels):
+            # load insulator template for j==0
+            mdata = entry(fcooling, {'i': i}, debug)
+            thermic_bcs_rob['boundary_Therm_Robin'].append( Merge({"name": "Channel%d" % i}, mdata["Channel%d" % i]) )
 
     for bc in boundary_meca:
         meca_bcs_dir['boundary_Meca_Dir'].append({"name":bc, "value":"{0,0}"})
@@ -469,28 +472,31 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         data["Materials"] = mmat
     
     # postprocess
-    if debug: print("flux")
-    flux_data = mpost["flux"]
-    add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-    odata = entry(templates["flux"], flux_data, debug)
-    for md in odata["Flux"]:
-        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
+    if method_data[3] != 'mag':
+        if debug: print("flux")
+        flux_data = mpost["flux"]
+        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
+        odata = entry(templates["flux"], flux_data, debug)
+        for md in odata["Flux"]:
+            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
     
-    if debug: print("meanT_H")
-    meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
-    add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-    odata = entry(templates["stats"][0], meanT_data, debug)
-    for md in odata["Stats_T"]:
-        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
+        if debug: print("meanT_H")
+        meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
+        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
+        odata = entry(templates["stats"][0], meanT_data, debug)
+        for md in odata["Stats_T"]:
+            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
 
     if debug: print("power_H")
     section = "electric"
-    if method_data[0] == "cfpdes" and method_data[2] == "Axi": section = "heat" 
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] != 'mag': section = "heat" 
+    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] == 'mag': section = "magnetic" 
     powerH_data = mpost["power_H"] # { "Power_H": [] }
     add = data["PostProcess"][section]["Measures"]["Statistics"]
-    odata = entry(templates["stats"][1], powerH_data, debug)
-    for md in odata["Stats_Power"]:
-        data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
+    if method_data[3] != 'mag':
+        odata = entry(templates["stats"][1], powerH_data, debug)
+        for md in odata["Stats_Power"]:
+            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
     mdata = json.dumps(data, indent = 4)
 
@@ -685,7 +691,8 @@ def main():
             params_data = create_params(gdata, method_data, args.debug)
 
             # bcs section
-            bcs_data = create_bcs(boundary_meca, 
+            bcs_data = create_bcs(args,
+                                  boundary_meca, 
                                   boundary_maxwell,
                                   boundary_electric,
                                   gdata, confdata, templates, method_data, args.debug) # merge all bcs dict
