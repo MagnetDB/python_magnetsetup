@@ -1,0 +1,633 @@
+{
+    "Name": "Fully coupled 3D Stationnary model",
+    "ShortName": "Full3DStat",
+    "Models": "hdg",
+    "Parameters": {
+        "Tinit": 293,
+        "h": 58222.1,
+        "Tw": 290.671,
+        "dTw": 12.74,
+        "h0": "h:h",
+        "Tw0": "Tw:Tw",
+        "dTw0": "dTw:dTw",
+        "Zmin0": -0.226,
+        "Zmax0": 0.108,
+        "Sh0": 0.09034717816899689,
+        "Dh0": 0.0015200000000000031,
+        "h1": "h:h",
+        "Tw1": "Tw:Tw",
+        "dTw1": "dTw:dTw",
+        "Zmin1": -0.226,
+        "Zmax1": 0.108,
+        "Sh1": 0.8090229401524438,
+        "Dh1": 0.011600000000000001,
+        "h2": "h:h",
+        "Tw2": "Tw:Tw",
+        "dTw2": "dTw:dTw",
+        "Zmin2": -0.108,
+        "Zmax2": 0.108,
+        "Sh2": 1.1578339724805184,
+        "Dh2": 0.013000000000000001,
+        "h3": "h:h",
+        "Tw3": "Tw:Tw",
+        "dTw3": "dTw:dTw",
+        "Zmin3": -0.125,
+        "Zmax3": 0.125,
+        "Sh3": 1.6412936659414512,
+        "Dh3": 0.014799999999999997,
+        "h4": "h:h",
+        "Tw4": "Tw:Tw",
+        "dTw4": "dTw:dTw",
+        "Zmin4": -0.125,
+        "Zmax4": 0.125,
+        "Sh4": 2.2206033512634105,
+        "Dh4": 0.016400000000000005,
+        "h5": "h:h",
+        "Tw5": "Tw:Tw",
+        "dTw5": "dTw:dTw",
+        "Zmin5": -0.14100000000000001,
+        "Zmax5": 0.14100000000000001,
+        "Sh5": 2.923566123430662,
+        "Dh5": 0.018000000000000002,
+        "h6": "h:h",
+        "Tw6": "Tw:Tw",
+        "dTw6": "dTw:dTw",
+        "Zmin6": -0.14100000000000001,
+        "Zmax6": 0.14100000000000001,
+        "Sh6": 3.9703762115333157,
+        "Dh6": 0.020599999999999993,
+        "h7": "h:h",
+        "Tw7": "Tw:Tw",
+        "dTw7": "dTw:dTw",
+        "Zmin7": -0.157,
+        "Zmax7": 0.157,
+        "Sh7": 5.269581853425381,
+        "Dh7": 0.02320000000000002,
+        "h8": "h:h",
+        "Tw8": "Tw:Tw",
+        "dTw8": "dTw:dTw",
+        "Zmin8": -0.157,
+        "Zmax8": 0.157,
+        "Sh8": 6.795893228245431,
+        "Dh8": 0.025599999999999967,
+        "h9": "h:h",
+        "Tw9": "Tw:Tw",
+        "dTw9": "dTw:dTw",
+        "Zmin9": -0.168,
+        "Zmax9": 0.168,
+        "Sh9": 8.545854584074567,
+        "Dh9": 0.027800000000000012,
+        "h10": "h:h",
+        "Tw10": "Tw:Tw",
+        "dTw10": "dTw:dTw",
+        "Zmin10": -0.168,
+        "Zmax10": 0.168,
+        "Sh10": 10.584025649944012,
+        "Dh10": 0.03,
+        "h11": "h:h",
+        "Tw11": "Tw:Tw",
+        "dTw11": "dTw:dTw",
+        "Zmin11": -0.179,
+        "Zmax11": 0.179,
+        "Sh11": 12.93321438851886,
+        "Dh11": 0.03220000000000002,
+        "h12": "h:h",
+        "Tw12": "Tw:Tw",
+        "dTw12": "dTw:dTw",
+        "Zmin12": -0.179,
+        "Zmax12": 0.179,
+        "Sh12": 15.616228762464134,
+        "Dh12": 0.03439999999999998,
+        "h13": "h:h",
+        "Tw13": "Tw:Tw",
+        "dTw13": "dTw:dTw",
+        "Zmin13": -0.19,
+        "Zmax13": 0.19,
+        "Sh13": 17.58208036544797,
+        "Dh13": 0.03460000000000003,
+        "h14": "h:h",
+        "Tw14": "Tw:Tw",
+        "dTw14": "dTw:dTw",
+        "Zmin14": -0.19,
+        "Zmax14": 0.19,
+        "Sh14": 17.75911696545937,
+        "Dh14": 0.03169999999999999
+    },
+    "Materials": {
+        "H1_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "52400000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H2_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53300000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H3_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "52600000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H4_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "52800000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H5_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53100000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H6_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53200000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H7_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53100000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H8_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "51900000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H9_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53700000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H10_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53300000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H11_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53800000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H12_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "53200000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H13_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "46500000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "H14_Cu": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50250000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "380.0",
+            "k": "k0:k0"
+        },
+        "R1": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "41000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R2": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "41000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R3": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R4": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R5": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R6": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R7": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R8": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R9": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R10": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R11": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R12": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "R13": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "50000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "320.0",
+            "k": "k0:k0"
+        },
+        "iL1": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "58000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "390.0",
+            "k": "k0:k0"
+        },
+        "oL2": {
+            "physics": [
+                "heat",
+                "electric"
+            ],
+            "sigma0": "58000000.0",
+            "sigma": "sigma0:sigma0",
+            "k0": "390.0",
+            "k": "k0:k0"
+        }
+    },
+    "InitialConditions": {
+        "temperature": {
+            "Expression": {
+                "myic": {
+                    "expr": "Tinit:Tinit"
+                }
+            }
+        }
+    },
+    "BoundaryConditions": {
+        "electric-potential": {
+            "Dirichlet": {
+                "Inner1_LV0": {
+                    "expr": "9"
+                },
+                "OuterL2_LV0": {
+                    "expr": "0"
+                }
+            },
+            "Neumann": {
+                "myneumannelec": {
+                    "markers": [
+                        "H1_Interface0",
+                        "H1_Interface1",
+                        "H2_Interface0",
+                        "H2_Interface1",
+                        "H3_Interface0",
+                        "H3_Interface1",
+                        "H4_Interface0",
+                        "H4_Interface1",
+                        "H5_Interface0",
+                        "H5_Interface1",
+                        "H6_Interface0",
+                        "H6_Interface1",
+                        "H7_Interface0",
+                        "H7_Interface1",
+                        "H8_Interface0",
+                        "H8_Interface1",
+                        "H9_Interface0",
+                        "H9_Interface1",
+                        "H10_Interface0",
+                        "H10_Interface1",
+                        "H11_Interface0",
+                        "H11_Interface1",
+                        "H12_Interface0",
+                        "H12_Interface1",
+                        "H13_Interface0",
+                        "H13_Interface1",
+                        "H14_Interface0",
+                        "H14_Interface1",
+                        "R1_HP",
+                        "R2_BP",
+                        "R3_HP",
+                        "R4_BP",
+                        "R5_HP",
+                        "R6_BP",
+                        "R7_HP",
+                        "R8_BP",
+                        "R9_HP",
+                        "R10_BP",
+                        "R11_HP",
+                        "R12_BP",
+                        "R13_HP",
+                        "Channel0",
+                        "Channel1",
+                        "Channel2",
+                        "Channel3",
+                        "Channel4",
+                        "Channel5",
+                        "Channel6",
+                        "Channel7",
+                        "Channel8",
+                        "Channel9",
+                        "Channel10",
+                        "Channel11",
+                        "Channel12",
+                        "Channel13",
+                        "Channel14",
+                        "Inner1_R0n",
+                        "Inner1_R1n",
+                        "Inner1_FixingHoles",
+                        "OuterL2_R0n",
+                        "OuterL2_R1n",
+                        "OuterL2_CooledSurfaces",
+                        "OuterL2_Others"
+                    ],
+                    "expr": 0
+                }
+            }
+        },
+        "temperature": {
+            "Robin": {
+                "Channel0": {
+                    "expr1": "h0:h0",
+                    "expr2": "h0*(Tw0+dTw0):h0:Tw0:dTw0"
+                },
+                "Channel1": {
+                    "expr1": "h1:h1",
+                    "expr2": "h1*(Tw1+dTw1):h1:Tw1:dTw1"
+                },
+                "Channel2": {
+                    "expr1": "h2:h2",
+                    "expr2": "h2*(Tw2+dTw2):h2:Tw2:dTw2"
+                },
+                "Channel3": {
+                    "expr1": "h3:h3",
+                    "expr2": "h3*(Tw3+dTw3):h3:Tw3:dTw3"
+                },
+                "Channel4": {
+                    "expr1": "h4:h4",
+                    "expr2": "h4*(Tw4+dTw4):h4:Tw4:dTw4"
+                },
+                "Channel5": {
+                    "expr1": "h5:h5",
+                    "expr2": "h5*(Tw5+dTw5):h5:Tw5:dTw5"
+                },
+                "Channel6": {
+                    "expr1": "h6:h6",
+                    "expr2": "h6*(Tw6+dTw6):h6:Tw6:dTw6"
+                },
+                "Channel7": {
+                    "expr1": "h7:h7",
+                    "expr2": "h7*(Tw7+dTw7):h7:Tw7:dTw7"
+                },
+                "Channel8": {
+                    "expr1": "h8:h8",
+                    "expr2": "h8*(Tw8+dTw8):h8:Tw8:dTw8"
+                },
+                "Channel9": {
+                    "expr1": "h9:h9",
+                    "expr2": "h9*(Tw9+dTw9):h9:Tw9:dTw9"
+                },
+                "Channel10": {
+                    "expr1": "h10:h10",
+                    "expr2": "h10*(Tw10+dTw10):h10:Tw10:dTw10"
+                },
+                "Channel11": {
+                    "expr1": "h11:h11",
+                    "expr2": "h11*(Tw11+dTw11):h11:Tw11:dTw11"
+                },
+                "Channel12": {
+                    "expr1": "h12:h12",
+                    "expr2": "h12*(Tw12+dTw12):h12:Tw12:dTw12"
+                },
+                "Channel13": {
+                    "expr1": "h13:h13",
+                    "expr2": "h13*(Tw13+dTw13):h13:Tw13:dTw13"
+                },
+                "Channel14": {
+                    "expr1": "h14:h14",
+                    "expr2": "h14*(Tw14+dTw14):h14:Tw14:dTw14"
+                }
+            },
+            "Neumann": {
+                "myneumannheat": {
+                    "markers": [
+                        "H1_Interface0",
+                        "H1_Interface1",
+                        "H2_Interface0",
+                        "H2_Interface1",
+                        "H3_Interface0",
+                        "H3_Interface1",
+                        "H4_Interface0",
+                        "H4_Interface1",
+                        "H5_Interface0",
+                        "H5_Interface1",
+                        "H6_Interface0",
+                        "H6_Interface1",
+                        "H7_Interface0",
+                        "H7_Interface1",
+                        "H8_Interface0",
+                        "H8_Interface1",
+                        "H9_Interface0",
+                        "H9_Interface1",
+                        "H10_Interface0",
+                        "H10_Interface1",
+                        "H11_Interface0",
+                        "H11_Interface1",
+                        "H12_Interface0",
+                        "H12_Interface1",
+                        "H13_Interface0",
+                        "H13_Interface1",
+                        "H14_Interface0",
+                        "H14_Interface1",
+                        "R1_HP",
+                        "R2_BP",
+                        "R3_HP",
+                        "R4_BP",
+                        "R5_HP",
+                        "R6_BP",
+                        "R7_HP",
+                        "R8_BP",
+                        "R9_HP",
+                        "R10_BP",
+                        "R11_HP",
+                        "R12_BP",
+                        "R13_HP",
+                        "Inner1_R0n",
+                        "Inner1_R1n",
+                        "Inner1_LV0",
+                        "Inner1_FixingHoles",
+                        "OuterL2_R0n",
+                        "OuterL2_R1n",
+                        "OuterL2_LV0",
+                        "OuterL2_CooledSurfaces",
+                        "OuterL2_Others"
+                    ],
+                    "expr": 0
+                }
+            }
+        }
+    },
+    "PostProcess": {
+        "use-model-name": 1,
+        "electric": {
+            "Exports": {
+                "fields": "all"
+            }
+        },
+        "heat": {
+            "Exports": {
+                "fields": "all"
+            }
+        }
+    }
+}

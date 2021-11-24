@@ -68,7 +68,6 @@ class appenv():
             print("appenv/template_path:", template_repo)
         return template_repo
 
-
 def loadconfig():
     """
     Load app config (aka magnetsetup.json)
@@ -94,7 +93,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     
     [method, time, geom, model, cooling] = method_data
     template_path = os.path.join(appenv.template_path(), method, geom, model)
-
+    
     cfg_model = appcfg[method][time][geom][model]["cfg"]
     json_model = appcfg[method][time][geom][model]["model"]
     if linear:
