@@ -333,7 +333,6 @@ def create_params(gdata: tuple, method_data: List[str], debug: bool=False):
 
     return params_data
 
-
 def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templates: dict, method_data: List[str], debug: bool = False):
     # TODO loop for Plateau (Axi specific)
     materials_dict = {}
@@ -391,7 +390,6 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
         materials_dict["oL2"] = mdata["oL2"]
 
     return materials_dict
-
 
 def create_bcs(args,
                boundary_meca: List, 
@@ -508,13 +506,6 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         out.write(mdata)
     pass
 
-def Merge(dict1, dict2):
-    """
-    Merge dict1 and dict2 to form a new dictionnary
-    """
-    res = {**dict1, **dict2}
-    return res
-
 def entry_cfg(template: str, rdata: dict, debug: bool = False):
     import chevron
 
@@ -539,9 +530,9 @@ def entry(template: str, rdata: dict, debug: bool = False):
     
     if debug:
         print("entry/jsonfile:", jsonfile)
-        print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
+        print("corrected:", re.sub(r',(?=\s*\})', '', jsonfile))
 
-    corrected = re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile)
+    corrected = re.sub(r',(?=\s*\})', '', jsonfile)
     mdata = json.loads(corrected)
     if debug:
         print("entry/data (json):\n", mdata)
@@ -639,9 +630,9 @@ def main():
                 
                 else:
                     with open(cad.Helices[i]+".yaml", "r") as f:
-                        hhelix = yaml.load(cad.Helices[i]+".yaml", Loader = yaml.FullLoader)
+                        hhelix = yaml.load(f, Loader = yaml.FullLoader)
                         (insulator_name, insulator_number) = hhelix.insulators()
-                        index_Insulators.append((insulator_name, insulator_number))
+                        #index_Insulators.append((insulator_name, insulator_number))        <--- !! WARNING !!
 
             for i in range(NRings):
                 part_thermic.append("R{}".format(i+1))
