@@ -483,7 +483,7 @@ def main():
     with open(yamlfile, 'r') as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
-            (NHelices, NRings, NChannels, Nsections, index_h, 
+            (NHelices, NRings, NChannels, Nsections, 
                 R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = python_magnetgeo.get_main_characteristics(cad)
         else:
             raise Exception("expected Insert yaml file")
