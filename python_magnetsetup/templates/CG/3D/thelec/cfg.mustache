@@ -1,0 +1,26 @@
+directory={{method}}-{{model}}{{geom}}-{{time}}{{linear}}/{{name}}
+# case.dimension={{dim}}
+
+case.discretization=P1 #P1,P2
+
+[thermo-electric]
+filename=$cfgdir/{{jsonfile}}
+
+mesh.filename=$cfgdir/test.med
+# gmsh.scale = {{scale}}
+gmsh.partition={{partition}}
+
+#[thermo-electric.gmsh]
+#scale=1000 # from mm to m
+
+[thermo-electric.heat]
+#initial-solution.temperature=293
+#verbose=1
+verbose_solvertimer=1
+pc-type=gamg
+ksp-monitor=1
+
+[thermo-electric.electric]
+verbose_solvertimer=1
+pc-type=gamg
+ksp-monitor=1

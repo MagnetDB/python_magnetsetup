@@ -345,8 +345,8 @@ def create_materials(gdata: tuple, idata: Optional[List], confdata: dict, templa
     # Loop for Helix
     for i in range(NHelices):
         if method_data[2] == "3D":
-            mdata = entry(fconductor, Merge({'name': "H%d" % (i+1), 'marker': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]) , debug)
-            materials_dict["H%d" % (i+1)] = mdata["H%d" % (i+1)]
+            mdata = entry(fconductor, Merge({'name': "H%d_Cu" % (i+1), 'marker': "H%d_Cu" % (i+1)}, confdata["Helix"][i]["material"]) , debug)
+            materials_dict["H%d_Cu" % (i+1)] = mdata["H%d_Cu" % (i+1)]
 
             # TODO deal with Glue/Kaptons
             if idata:
@@ -460,9 +460,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     """
 
     print("create_json =", jsonfile)
-    print("------------------------------------------")
     data = entry(templates["model"], mdict, debug)
-    print("------------------------------------------")
 
     # material section
     if "Materials" in data:
@@ -472,31 +470,39 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
         data["Materials"] = mmat
     
     # postprocess
-    if method_data[3] != 'mag':
-        if debug: print("flux")
-        flux_data = mpost["flux"]
-        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-        odata = entry(templates["flux"], flux_data, debug)
-        for md in odata["Flux"]:
-            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Flux"][md]
-    
-        if debug: print("meanT_H")
-        meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
-        add = data["PostProcess"]["heat"]["Measures"]["Statistics"]
-        odata = entry(templates["stats"][0], meanT_data, debug)
-        for md in odata["Stats_T"]:
-            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
+    if method_data[0] == 'cfpdes':
+        if method_data[3] != 'mag':
+            
+            if method_data[0] == "cfpdes":
+                section = "heat"
+            elif method_data[0] == "CG" or method_data[0] == "HDG":
+                section = "temperature"
 
-    if debug: print("power_H")
-    section = "electric"
-    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] != 'mag': section = "heat" 
-    if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] == 'mag': section = "magnetic" 
-    powerH_data = mpost["power_H"] # { "Power_H": [] }
-    add = data["PostProcess"][section]["Measures"]["Statistics"]
-    if method_data[3] != 'mag':
-        odata = entry(templates["stats"][1], powerH_data, debug)
-        for md in odata["Stats_Power"]:
-            data["PostProcess"]["heat"]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
+            if debug: print("flux")
+            flux_data = mpost["flux"]
+            add = data["PostProcess"][section]["Measures"]["Statistics"]
+            odata = entry(templates["flux"], flux_data, debug)
+            for md in odata["Flux"]:
+                data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Flux"][md]
+
+            if debug: print("meanT_H")
+            meanT_data = mpost["meanT_H"] # { "meanT_H": [] }
+            add = data["PostProcess"][section]["Measures"]["Statistics"]
+            odata = entry(templates["stats"][0], meanT_data, debug)
+            for md in odata["Stats_T"]:
+                data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_T"][md]
+
+        if debug: print("power_H")
+        section = "electric"
+        if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] == 'th': section = "heat" 
+        elif method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] != 'th': section = "magnetic"
+        # elif method_data[0] == "CG" or method_data[0] == "HDG" : section = "magnetic"
+        powerH_data = mpost["power_H"] # { "Power_H": [] }
+        add = data["PostProcess"][section]["Measures"]["Statistics"]
+        if method_data[3] != 'mag':
+            odata = entry(templates["stats"][1], powerH_data, debug)
+            for md in odata["Stats_Power"]:
+                data["PostProcess"][section]["Measures"]["Statistics"][md] = odata["Stats_Power"][md]
     
     mdata = json.dumps(data, indent = 4)
 
@@ -605,7 +611,7 @@ def main():
     index_electric = []
     index_Helices = []
     index_Insulators = []
-    
+
     boundary_meca = []
     boundary_maxwell = []
     boundary_electric = []
@@ -620,15 +626,16 @@ def main():
             print("Insert: %s" % cad.name, "NHelices=%d NRings=%d NChannels=%d" % (NHelices, NRings, NChannels))
 
             for i in range(NHelices):
-                part_electric.append("H{}".format(i+1))
+                part_electric.append("H{}_Cu".format(i+1))
                 if args.geom == "Axi":
                     for j in range(Nsections[i]+2):
                         part_thermic.append("H{}_Cu{}".format(i+1,j))
                     for j in range(Nsections[i]):
                         index_electric.append( [str(i+1),str(j+1)] )
                     index_Helices.append(["0:{}".format(Nsections[i]+2)])
-                
+
                 else:
+                    part_thermic.append("H{}_Cu".format(i+1))
                     with open(cad.Helices[i]+".yaml", "r") as f:
                         hhelix = yaml.load(f, Loader = yaml.FullLoader)
                         (insulator_name, insulator_number) = hhelix.insulators()
@@ -713,8 +720,8 @@ def main():
                     meanT_data["meanT_H"].append( {"header": "MeanT_H{}".format(i+1), "name": "H{}_Cu%1%".format(i+1), "index": index_Helices[i]} )
             else:
                 for i in range(NHelices) :
-                    powerH_data["Power_H"].append( {"header": "Power_H{}".format(i+1), "name": "H{}".format(i+1)} )
-                    meanT_data["meanT_H"].append( {"header": "MeanT_H{}".format(i+1), "name": "H{}".format(i+1)} )
+                    powerH_data["Power_H"].append( {"header": "Power_H{}".format(i+1), "name": "H{}_Cu".format(i+1)} )
+                    meanT_data["meanT_H"].append( {"header": "MeanT_H{}".format(i+1), "name": "H{}_Cu".format(i+1)} )
                 # TODO add Glue/Kaptons
                 for i in range(NRings) :
                     powerH_data["Power_H"].append( {"header": "Power_R{}".format(i+1), "name": "R{}".format(i+1)} )
