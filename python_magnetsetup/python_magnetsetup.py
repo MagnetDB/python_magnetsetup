@@ -43,6 +43,20 @@ import json
 import argparse
 import pathlib
 
+#import numpy as np 
+import warnings
+from pint import UnitRegistry, Unit, Quantity
+
+# Ignore warning for pint
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    Quantity([])
+
+# Pint configuration
+ureg = UnitRegistry()
+ureg.default_system = 'SI'
+ureg.autoconvert_offset_to_baseunit = True
+
 # Global variables
 url_api = 'http://localhost:8000/api'
 
@@ -52,6 +66,60 @@ def Merge(dict1, dict2):
     """
     res = {**dict1, **dict2}
     return res
+
+def convert_data(distance_unit, confdata, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, h, mu0):
+    """Return the dictionnary confdata_convert and distances : R1, R2,
+        Z1, Z2, Zmin, Zmax, Dh and Sh with values converted on distance
+        unit : distance_unit.
+        
+        input:
+            - distance_unit (str)
+            - confdata (dict)
+            - R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh (float)
+        
+        return:
+            - confdata_convert (dict)
+            - R1_convert, R2_convert, Z1_convert, Z2_convert, Zmin_convert, Zmax_convert, Dh_convert, Sh_convert (float)
+    """
+    
+    # Convert
+    confdata_convert = confdata.copy()
+
+    for mtype in ["Helix", "Ring", "Lead"]:
+        for i in range(len(confdata_convert[mtype])):
+            
+            # ThermalConductivity : W/m/K --> W/distance_unit/K
+            confdata_convert[mtype][i]["material"]["ThermalConductivity"] = Quantity( confdata_convert[mtype][i]["material"]["ThermalConductivity"], ureg.watt / ureg.meter / ureg.kelvin ).to( ureg.watt / ureg.Unit(distance_unit) / ureg.kelvin ).magnitude
+            
+            # Young : kg/m/s --> kg/distance_unit/s
+            confdata_convert[mtype][i]["material"]["Young"] = Quantity( confdata_convert[mtype][i]["material"]["Young"], ureg.kilogram / ureg.meter / ureg.second ).to( ureg.kilogram / ureg.Unit(distance_unit) / ureg.second ).magnitude
+            
+            # VolumicMass : kg/m3 --> kg/distance_unit**3
+            confdata_convert[mtype][i]["material"]["VolumicMass"] = Quantity( confdata_convert[mtype][i]["material"]["VolumicMass"], ureg.kilogram / ureg.meter**3 ).to( ureg.kilogram / ureg.Unit(distance_unit)**3 ).magnitude
+            
+            # ElectricalConductivity : S/m --> S/distance_unit
+            confdata_convert[mtype][i]["material"]["ElectricalConductivity"] = Quantity( confdata_convert[mtype][i]["material"]["ElectricalConductivity"], ureg.siemens / ureg.meter ).to( ureg.siemens / ureg.Unit(distance_unit) ).magnitude
+
+            # Rpe : kg/m/s --> kg/distance_unit/s
+            confdata_convert[mtype][i]["material"]["Rpe"] = Quantity( confdata_convert[mtype][i]["material"]["Rpe"], ureg.kilogram / ureg.meter / ureg.second ).to( ureg.kilogram / ureg.Unit(distance_unit) / ureg.second ).magnitude
+
+    # mm -> distance_unit
+    R1_convert   = Quantity( R1, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    R2_convert   = Quantity( R2, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Z1_convert   = Quantity( Z1, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Z2_convert   = Quantity( Z2, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Zmin_convert = Quantity( Zmin, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Zmax_convert = Quantity( Zmax, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Dh_convert   = Quantity( Dh, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    Sh_convert   = Quantity( Sh, ureg.millimeter ).to( ureg.Unit(distance_unit) ).magnitude.tolist()
+    
+    # MagnetPermeability of vacuum : H/m --> H/distance_unit
+    mu0_convert = Quantity( mu0, ureg.henry / ureg.meter ).to( ureg.henry / ureg.Unit(distance_unit) ).magnitude
+
+    # Convection coefficients : W/m2/K --> W/distance_unit**2/K
+    h_convert = Quantity( h, ureg.watt / ureg.meter**2 / ureg.kelvin ).to( ureg.watt / ureg.Unit(distance_unit)**2 / ureg.kelvin ).magnitude
+
+    return confdata_convert, R1_convert, R2_convert, Z1_convert, Z2_convert, Zmin_convert, Zmax_convert, Dh_convert, Sh_convert, h_convert, mu0_convert
 
 def create_indices(NHelices, Nsections):
     """Create indices of Markers :
@@ -162,7 +230,7 @@ def create_boundary_withoutChannels(NHelices, NRings):
 
     return boundary_withoutChannels
 
-def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
+def create_params_dict(args, Zmin, Zmax, Sh, Dh, Tinit, Tin, h, Tw, dTw, mu0, NHelices, Nsections):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
     """
@@ -176,19 +244,17 @@ def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
         params_dict["bool_dilatation"] = "1"
 
     # TODO : initialization of parameters
+    params_dict["mu0"] = mu0
+    params_dict["Tinit"] = Tinit
+    params_dict["Tin"] = Tin
 
-    params_dict["Tinit"] = 293
-    params_dict["h"] = 58222.1
-    params_dict["Tw"] = 290.671
-    params_dict["dTw"] = 12.74
-    
     # params per cooling channels
     # h%d, Tw%d, dTw%d, Dh%d, Sh%d, Zmin%d, Zmax%d :
 
     for i in range(NHelices+1):
-        params_dict["h%d" % i] = "h:h"
-        params_dict["Tw%d" % i] = "Tw:Tw"
-        params_dict["dTw%d" % i] = "dTw:dTw"
+        params_dict["h%d" % i] = h[i]
+        params_dict["Tw%d" % i] = Tw[i]
+        params_dict["dTw%d" % i] = dTw[i]
         params_dict["Zmin%d" % i] = Zmin[i]
         params_dict["Zmax%d" % i] = Zmax[i]
         params_dict["Sh%d" % i] = Sh[i]
@@ -199,7 +265,7 @@ def create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections):
         for i in range(NHelices):
             for j in range(Nsections[i]):
                 params_dict["U_H%d_Cu%d" % (i+1, j+1)] = "1"
-    
+
     return params_dict
 
 def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, fconductorbis, NHelices, Nsections, NRings):
@@ -281,7 +347,7 @@ def create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, fin
 
     return materials_dict
 
-def create_materials_hdg(confdata, finsulator, fconductor, NHelices, NRings):
+def create_materials_hdg_cg(confdata, finsulator, fconductor, NHelices, NRings):
     """
     Return materials_dict, the dictionnary of section \"Materials\" for JSON file for HDG method.
     """
@@ -363,7 +429,8 @@ def main():
                     choices=['linear', 'nonlinear'], default='linear')
     parser.add_argument("--cooling", help="choose cooling type", type=str,
                     choices=['mean', 'grad'], default='mean')
-    parser.add_argument("--scale", help="scale of geometry", type=float, default=1e-3)
+    parser.add_argument("--distance_unit", help="distance's unit", type=str,
+                    choices=['meter','millimeter'], default='meter')
 
     parser.add_argument("--debug", help="activate debug", action='store_true')
     parser.add_argument("--verbose", help="activate verbose", action='store_true')
@@ -381,7 +448,7 @@ def main():
         print("You can't enter datafile and magnet together.")
         exit(1)
 
-    if ( args.method == "HDG"):
+    if ( args.method == "HDG" ) or ( args.method == "CG" ):
         args.model = 'th'
         args.geom = '3D'
 
@@ -416,16 +483,23 @@ def main():
     with open(yamlfile, 'r') as cfgdata:
         cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
         if isinstance(cad, Insert):
-            (NHelices, NRings, NChannels, Nsections, index_h, 
+            (NHelices, NRings, NChannels, Nsections, 
                 R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = python_magnetgeo.get_main_characteristics(cad)
         else:
             raise Exception("expected Insert yaml file")
 
-    # TODO : manage the scale
-    for i in range(len(Zmin)): Zmin[i] *= args.scale
-    for i in range(len(Zmax)): Zmax[i] *= args.scale
-    for i in range(len(Dh)): Dh[i] *= args.scale
-    for i in range(len(Sh)): Sh[i] *= args.scale
+    # Input values
+    Tinit = 293
+    Tin = 284.15
+    h = [ 58222.1 ] * NChannels
+    Tw = [ 290.671 ] * NChannels
+    dTw = [ 12.74 ] * NChannels
+    mu0 = 1 #4*math.pi * 1e-7
+
+    # Manage the distance unit
+    confdata, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, h, mu0 = convert_data(args.distance_unit, confdata, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh, h, mu0)
+
+    #print("R1={}, R2={}, Z1={}, Z2={}, Zmin={}, Zmax={}, Dh={}, Sh={}, h={}, mu0={}".format(type(R1), type(R2), type(Z1), type(Z2), type(Zmin), type(Zmax), type(Dh), type(Sh), type(h), type(mu0)))
 
     # Create indices and marker's names
     index_H, index_conductor, index_Helices, index_HelicesConductor = create_indices(NHelices, Nsections)
@@ -469,17 +543,17 @@ def main():
         data = json.loads(jsonfile)
         
         # Fill parameters
-        params_dict = create_params_dict(args, Zmin, Zmax, Sh, Dh, NHelices, Nsections)
-
+        params_dict = create_params_dict(args, Zmin, Zmax, Sh, Dh, Tinit, Tin, h, Tw, dTw, mu0, NHelices, Nsections)
+        
         for key in params_dict:
             data["Parameters"][key] = params_dict[key]
 
         # Fill materials (Axi specific)
         if args.method == 'cfpdes':
             materials_dict = create_materials_cfpdes(args, cwd, magnetsetup, template_path, confdata, finsulator, fconductor, fconductorbis, NHelices, Nsections, NRings)
-        elif args.method == 'HDG':
-            materials_dict = create_materials_hdg(confdata, finsulator, fconductor, NHelices, NRings)
-        
+        elif ( args.method == 'HDG' ) or ( args.method == 'CG' ) :
+            materials_dict = create_materials_hdg_cg(confdata, finsulator, fconductor, NHelices, NRings)
+
         for key in materials_dict:
             data["Materials"][key] = materials_dict[key]
 
@@ -488,7 +562,7 @@ def main():
         if args.model != 'mag':
             if args.method == 'cfpdes':
                 data["BoundaryConditions"]["heat"]["Robin"] = create_bcsFlux_dict(NChannels, fcooling)
-            elif args.method == 'HDG':
+            elif ( args.method == 'HDG' ) or ( args.method == 'CG' ) :
                 data["BoundaryConditions"]["temperature"]["Robin"] = create_bcsFlux_dict(NChannels, fcooling)
 
         # HDG case
@@ -514,7 +588,6 @@ def main():
                 data["PostProcess"]["magnetic"]["Measures"]["Statistics"]["Power_H{}".format(i+1)] = {"type" : "integrate",
                     "expr":"2*pi*materials_sigma*(materials_U/2/pi)*(materials_U/2/pi)/x:materials_sigma:materials_U:x".format(i+1),
                     "markers": {"name": "H{}_Cu%1%".format(i+1),"index1":index_HelicesConductor[i]}}
-
 
         # save json (NB use x to avoid overwrite file)
         if args.datafile != None :
