@@ -70,7 +70,7 @@
 	    	{
 				"H1_Fixed":
 				{
-		    		"markers": {{boundary_Ring}},
+		    		"markers": {{boundary_Meca}},
 		    		"expr":"{0,0}"
 				}
 	    	}
@@ -80,12 +80,12 @@
     {
         "temperature":
         {
-            "Expression":
+            "File":
             {
                 "myic":
                 {
-                    "markers": {{part_withoutAir}},
-					"expr":"Tinit:Tinit"
+                    "filename": {{temperature_init}},
+                    "format":"hdf5"
                 }
             }
         }
@@ -112,7 +112,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"Jth":
@@ -121,7 +121,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"Qth":
@@ -130,7 +130,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"Flaplace":
@@ -139,7 +139,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 		    		"sigma":
@@ -208,7 +208,7 @@
 						"markers":
 						{
 			    			"name": ["H%1_1%_Cu%1_2%"],
-			    			"index1": {{index_conductor}}
+			    			"index1": {{index_electric}}
 						}
 		    		},
 					"Intensity_H%1_1%_Cu%1_2%":
@@ -216,7 +216,7 @@
     					"type":"integrate",
     					"expr":"-materials_H%1_1%_Cu%1_2%_sigma*materials_H%1_1%_Cu%1_2%_U/2/pi/x:materials_H%1_1%_Cu%1_2%_sigma:materials_H%1_1%_Cu%1_2%_U:x",
     					"markers": "H%1_1%_Cu%1_2%",
-    					"index1": {{index_conductor}}
+    					"index1": {{index_electric}}
 					}
 				}
 	    	}
@@ -238,14 +238,7 @@
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
-		    		},
-					"Flux_Channel%1%":
-					{
-    					"type":"integrate",
-					    "expr":"h%1%*(heat_T-(Tw%1%+dTw%1%))*2*pi*x:x:heat_T:h%1%:Tw%1%:dTw%1%",
-						"markers":"Channel%1%",
-					    "index1": "{{imin}}:{{imax}}"
-					}
+		    		}
 				}
 	    	}
 		}

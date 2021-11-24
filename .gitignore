@@ -104,9 +104,19 @@ ENV/
 # IDE settings
 .vscode/
 
+# Mesg
 *.msh
 *.xao
 *.brep
 *~
 
 test.py
+# data folder
+data
+
+log*
+
+\#*\#
+.\#*
+
+*.hdf
