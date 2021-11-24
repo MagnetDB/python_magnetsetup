@@ -461,7 +461,7 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     Create a json model file
     """
 
-    print("create_json=", jsonfile)
+    print("create_json =", jsonfile)
     print("------------------------------------------")
     data = entry(templates["model"], mdict, debug)
     print("------------------------------------------")
