@@ -137,7 +137,7 @@ def loadtemplates(appenv: appenv, appcfg: dict , method_data: List[str], linear:
     }
 
     if model != 'mag':
-        dict = merge(dict, {"cooling": fcooling, "flux": fflux, "stats": [fstats_T, fstats_Power] })
+        dict = Merge(dict, {"cooling": fcooling, "flux": fflux, "stats": [fstats_T, fstats_Power] })
 
     if check_templates(dict):
         pass
@@ -462,8 +462,10 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
     """
 
     print("create_json=", jsonfile)
+    print("------------------------------------------")
     data = entry(templates["model"], mdict, debug)
-    
+    print("------------------------------------------")
+
     # material section
     if "Materials" in data:
         for key in mmat:
@@ -534,6 +536,7 @@ def entry(template: str, rdata: dict, debug: bool = False):
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("\'", "\"")
+    
     if debug:
         print("entry/jsonfile:", jsonfile)
         print("corrected:", re.sub(r'},\n[\t ]+}\n', '}\n}\n', jsonfile))
@@ -689,7 +692,7 @@ def main():
 
             # params section
             params_data = create_params(gdata, method_data, args.debug)
-
+            
             # bcs section
             bcs_data = create_bcs(args,
                                   boundary_meca, 
@@ -710,7 +713,7 @@ def main():
                 "V_initfile": "Vini.h5"
             }
             mdict = Merge( Merge(main_data, params_data), bcs_data)
-
+        
             powerH_data = { "Power_H": [] }
             meanT_data = { "meanT_H": [] }
             if args.geom == "Axi":
