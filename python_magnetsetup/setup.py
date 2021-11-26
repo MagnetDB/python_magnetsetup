@@ -576,8 +576,8 @@ def create_json(jsonfile: str, mdict: dict, mmat: dict, mpost: dict, templates: 
 
         if debug: print("power_H")
         section = "electric"
-        if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] == 'th': section = "heat" 
-        elif method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] != 'th': section = "magnetic"
+        if method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] == 'thelec': section = "heat" 
+        elif method_data[0] == "cfpdes" and method_data[2] == "Axi" and method_data[3] != 'thelec': section = "magnetic"
         # elif method_data[0] == "CG" or method_data[0] == "HDG" : section = "magnetic"
         powerH_data = mpost["power_H"] # { "Power_H": [] }
         add = data["PostProcess"][section]["Measures"]["Statistics"]
