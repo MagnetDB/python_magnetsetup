@@ -302,7 +302,7 @@ def convert_data(distance_unit, confdata, gdata, h, mu0):
     # Convection coefficients : W/m2/K --> W/distance_unit**2/K
     h_convert = Quantity( h, ureg.watt / ureg.meter**2 / ureg.kelvin ).to( ureg.watt / ureg.Unit(distance_unit)**2 / ureg.kelvin ).magnitude
 
-    return confdata_convert, gdata, h_convert, mu0_convert
+    return confdata_convert, gdata_convert, h_convert, mu0_convert
 
 def create_cfg(cfgfile:str, name: str, nonlinear: bool, jsonfile: str, template: str, method_data: List[str], debug: bool=False):
     """
