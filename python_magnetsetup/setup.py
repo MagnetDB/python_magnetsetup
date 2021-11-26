@@ -242,18 +242,8 @@ def load_object_from_db(appenv: appenv, mtype: str, name: str, debug: bool = Fal
     return query_db(appenv, mtype, name, debug)
 
 def convert_data(distance_unit, confdata, gdata, h, mu0):
-    """Return the dictionnary confdata_convert and distances : R1, R2,
-        Z1, Z2, Zmin, Zmax, Dh and Sh with values converted on distance
-        unit : distance_unit.
-        
-        input:
-            - distance_unit (str)
-            - confdata (dict)
-            - R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh (float)
-        
-        return:
-            - confdata_convert (dict)
-            - R1_convert, R2_convert, Z1_convert, Z2_convert, Zmin_convert, Zmax_convert, Dh_convert, Sh_convert (float)
+    """
+    Convert the input in distance_unit ('meter' or millimeter).
     """
     
     import warnings
@@ -269,7 +259,6 @@ def convert_data(distance_unit, confdata, gdata, h, mu0):
     ureg.default_system = 'SI'
     ureg.autoconvert_offset_to_baseunit = True
 
-    # Convert
     (NHelices, NRings, NChannels, Nsections, R1, R2, Z1, Z2, Zmin, Zmax, Dh, Sh) = gdata
 
     confdata_convert = confdata.copy()
@@ -726,7 +715,7 @@ def main():
                     with open(cad.Helices[i]+".yaml", "r") as f:
                         hhelix = yaml.load(f, Loader = yaml.FullLoader)
                         (insulator_name, insulator_number) = hhelix.insulators()
-                        #index_Insulators.append((insulator_name, insulator_number))        <--- !! WARNING !!
+                        #index_Insulators.append((insulator_name, insulator_number))        <--- !! WARNING !! Ignore the insulator for 3D geometry
                 
                 boundary_Therm_Neu.append("H{}_Interface0".format(i+1))
                 boundary_Therm_Neu.append("H{}_Interface1".format(i+1))
