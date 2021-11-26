@@ -195,7 +195,27 @@
 		"static":
 		{
 			"3D":
-			{
+		        {
+				"thelec":
+				{
+					"model": "json.mustache",
+					"cfg": "cfg.mustache",
+					"conductor-linear": "conductor-linear-static.mustache",
+					"conductor-nonlinear": "conductor-nonlinear-static.mustache",
+					"insulator": "insulator-static.mustache",
+					"cooling":
+					{
+						"mean": "channel-mean.mustache",
+						"grad": "channel-grad.mustache"
+					},
+					"cooling-post":
+					{
+						"mean": "flux-channel-mean.mustache",
+						"grad": "flux-channel-grad.mustache"
+					},
+					"stats_T": "stats_T.mustache",
+					"stats_Power": "stats_Power.mustache"
+				}
 			}
 		},
 		"transient":	
