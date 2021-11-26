@@ -104,15 +104,13 @@ ENV/
 # IDE settings
 .vscode/
 
-# Mesg
+# Mesh
 *.msh
 *.xao
 *.brep
-*~
+*.h5
 
-test.py
-# data folder
-data
+*~
 
 log*
 
