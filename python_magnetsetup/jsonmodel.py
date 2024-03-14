@@ -1,7 +1,7 @@
 """
 Json file
 """
-from typing import List, Union, Optional
+from typing import List, Optional
 
 import json
 
@@ -206,7 +206,7 @@ def create_params_bitter(
         Zh = convert_data(units, Zh, "Length")
 
     # depending on method_data[4] (aka args.cooling)
-    if not "H" in method_data[4]:
+    if "H" not in method_data[4]:
         params_data["Parameters"].append(
             {"name": f"hw_{name}", "value": convert_data(units, 58222.1, "h")}
         )
@@ -267,7 +267,7 @@ def create_params_bitter(
     if method_data[2] == "Axi":
         num = 0
         for i, sname in enumerate(snames):
-            if not i in ignore_index:
+            if i not in ignore_index:
                 print(f"N_{sname}: i={i}")
                 params_data["Parameters"].append({"name": f"U_{sname}", "value": "1"})
                 params_data["Parameters"].append(
@@ -363,7 +363,7 @@ def create_params_insert(
         )
 
     # get value from coolingmethod and Flow(I) value
-    if not "H" in method_data[4]:
+    if "H" not in method_data[4]:
         params_data["Parameters"].append(
             {"name": f"hw_{prefix}Channel", "value": convert_data(units, 58222.1, "h")}
         )
