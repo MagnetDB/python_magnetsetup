@@ -1,4 +1,3 @@
-from typing import List, Type
 
 import yaml
 import copy
@@ -121,7 +120,7 @@ def Insert_setup(
     mname: str,
     confdata: dict,
     cad: Insert,
-    method_data: List,
+    method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,

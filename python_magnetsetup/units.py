@@ -3,7 +3,7 @@ Check for unit consistency
 Depending on Length base unit
 """
 
-from typing import List, Optional, Union
+from typing import Union
 
 import sys
 import os
@@ -81,7 +81,7 @@ def load_units(distance_unit: str):
 
 def convert_data(
     units: dict,
-    quantity: Union[int, float, List[float]],
+    quantity: Union[int, float, list[float]],
     qtype: str,
     debug: bool = False,
 ):

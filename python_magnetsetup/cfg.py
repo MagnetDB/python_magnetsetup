@@ -1,4 +1,3 @@
-from typing import List, Optional
 
 def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
     import chevron
@@ -11,7 +10,7 @@ def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
     jsonfile = jsonfile.replace("\'", "\"")
     return jsonfile
 
-def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str, template: str, method_data: List[str], debug: bool=False):
+def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str, template: str, method_data: list[str], debug: bool=False):
     """
     Create a cfg file
     """

@@ -1,4 +1,3 @@
-from typing import List, Optional
 
 import yaml
 import copy
@@ -34,7 +33,7 @@ def Bitter_setup(
     mname: str,
     confdata: dict,
     cad: Bitter,
-    method_data: List,
+    method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,

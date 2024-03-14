@@ -1,6 +1,5 @@
 import json
 import os
-from typing import List, Optional
 
 from decouple import Config, RepositoryEnv
 
@@ -20,13 +19,13 @@ class appenv:
         optim_repo: str = None,
     ):
         self.url_api: str = url_api
-        self.yaml_repo: Optional[str] = yaml_repo
-        self.cad_repo: Optional[str] = cad_repo
-        self.mesh_repo: Optional[str] = mesh_repo
-        self.template_repo: Optional[str] = template_repo
-        self.simage_repo: Optional[str] = simage_repo
-        self.mrecord_repo: Optional[str] = mrecord_repo
-        self.optim_repo: Optional[str] = optim_repo
+        self.yaml_repo: str | None = yaml_repo
+        self.cad_repo: str | None = cad_repo
+        self.mesh_repo: str | None = mesh_repo
+        self.template_repo: str | None = template_repo
+        self.simage_repo: str | None = simage_repo
+        self.mrecord_repo: str | None = mrecord_repo
+        self.optim_repo: str | None = optim_repo
 
         if envfile is not None:
             envdata = RepositoryEnv(envfile)
@@ -90,7 +89,7 @@ def loadconfig():
 
 
 def loadtemplates(
-    appenv: appenv, appcfg: dict, method_data: List[str], debug: bool = False
+    appenv: appenv, appcfg: dict, method_data: list[str], debug: bool = False
 ):
     """
     Load templates into a dict
@@ -203,7 +202,7 @@ def check_templates(templates: dict):
     return True
 
 
-def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
+def supported_models(Appcfg, method: str, geom: str, time: str) -> list:
     """
     get supported models by method as a list
     """
@@ -218,7 +217,7 @@ def supported_models(Appcfg, method: str, geom: str, time: str) -> List:
     return models
 
 
-def supported_methods(Appcfg) -> List:
+def supported_methods(Appcfg) -> list:
     """
     get supported methods as a list
     """
