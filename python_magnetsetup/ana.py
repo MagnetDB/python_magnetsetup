@@ -1,7 +1,5 @@
 """Console script for linking python_magnetsetup and python_magnettoos."""
 
-from typing import List, Optional
-
 import sys
 import os
 import json

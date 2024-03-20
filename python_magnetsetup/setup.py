@@ -24,8 +24,6 @@ mustache templates
 # TODO check for unit consistency
 # depending on Length base unit
 
-from typing import List, Optional
-
 import os
 import re
 import json
@@ -117,7 +115,7 @@ def magnet_setup(
     MyEnv,
     mname: str,
     confdata: str,
-    method_data: List,
+    method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,
@@ -334,7 +332,7 @@ def msite_simfile(MyEnv, confdata: str, addAir: bool = False, session=None):
 def msite_setup(
     MyEnv,
     confdata: str,
-    method_data: List,
+    method_data: list,
     templates: dict,
     currents: dict,
     debug: bool = False,

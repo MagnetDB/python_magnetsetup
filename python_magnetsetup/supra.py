@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 import os
 import yaml
 import copy
@@ -41,7 +39,7 @@ def Supra_setup(
     mname: str,
     confdata: dict,
     cad: Supra,
-    method_data: List,
+    method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,

@@ -1,7 +1,6 @@
 """
 Json file
 """
-from typing import List, Union, Optional
 
 import json
 
@@ -12,7 +11,7 @@ from .units import load_units, convert_data
 
 
 def create_params_csvfiles_supra(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -22,7 +21,7 @@ def create_params_csvfiles_supra(
 
 
 def create_params_supra(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -67,7 +66,7 @@ def create_params_supra(
 
 
 def create_params_csvfiles_bitter(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -106,7 +105,7 @@ def create_params_csvfiles_bitter(
 
 
 def create_params_csvfiles_insert(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -148,7 +147,7 @@ def create_params_csvfiles_insert(
 
 
 def create_params_bitter(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ):
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -287,7 +286,7 @@ def create_params_bitter(
 
 
 def create_params_insert(
-    mname: str, gdata: tuple, method_data: List[str], debug: bool = False
+    mname: str, gdata: tuple, method_data: list[str], debug: bool = False
 ) -> dict:
     """
     Return params_dict, the dictionnary of section \"Parameters\" for JSON file.
@@ -468,7 +467,7 @@ def create_materials_supra(
     gdata: tuple,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     materials_dict = {}
@@ -503,7 +502,7 @@ def create_materials_bitter(
     maindata: dict,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     materials_dict = {}
@@ -588,10 +587,10 @@ def create_materials_bitter(
 def create_materials_insert(
     gdata: tuple,
     maindata: dict,
-    idata: Optional[List],
+    idata: list | None,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     # TODO loop for Plateau (Axi specific)
@@ -748,7 +747,7 @@ def create_models_supra(
     gdata: tuple,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     equation: str,
     debug: bool = False,
 ) -> dict:
@@ -784,7 +783,7 @@ def create_models_bitter(
     maindata: dict,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     equation: str,
     debug: bool = False,
 ) -> dict:
@@ -844,7 +843,7 @@ def create_models_insert(
     maindata: dict,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     equation: str,
     debug: bool = False,
 ) -> dict:
@@ -903,13 +902,13 @@ def create_models_insert(
 
 
 def create_bcs_supra(
-    boundary_meca: List,
-    boundary_maxwell: List,
-    boundary_electric: List,
+    boundary_meca: list,
+    boundary_maxwell: list,
+    boundary_electric: list,
     gdata: tuple,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     print("create_bcs_supra from templates")
@@ -927,13 +926,13 @@ def create_bcs_supra(
 
 
 def create_bcs_bitter(
-    boundary_meca: List,
-    boundary_maxwell: List,
-    boundary_electric: List,
+    boundary_meca: list,
+    boundary_maxwell: list,
+    boundary_electric: list,
     gdata: tuple,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     (
@@ -1022,13 +1021,13 @@ def create_bcs_bitter(
 
 
 def create_bcs_insert(
-    boundary_meca: List,
-    boundary_maxwell: List,
-    boundary_electric: List,
+    boundary_meca: list,
+    boundary_maxwell: list,
+    boundary_electric: list,
     gdata: tuple,
     confdata: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ) -> dict:
     print("create_bcs_insert from templates")
@@ -1152,7 +1151,7 @@ def create_json(
     mmodels: dict,
     mpost: dict,
     templates: dict,
-    method_data: List[str],
+    method_data: list[str],
     debug: bool = False,
 ):
     """
@@ -1288,7 +1287,7 @@ def create_json(
     return
 
 
-def entry(template: str, rdata: List, debug: bool = False) -> str:
+def entry(template: str, rdata: list, debug: bool = False) -> str:
     import chevron
     import re
 
