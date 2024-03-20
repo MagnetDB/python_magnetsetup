@@ -19,7 +19,7 @@ from python_magnetgeo.SupraStructure import HTSinsert
 
 from .file_utils import MyOpen, findfile, search_paths
 
-import MagnetTools.MagnetTools as mt
+import magnettools.magnettools as mt
 
 def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     """

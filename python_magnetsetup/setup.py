@@ -25,18 +25,16 @@ mustache templates
 # depending on Length base unit
 
 import os
-import re
-import json
 import yaml
 import itertools
-import math
 
-from python_magnetgeo.Insert import Insert
-from python_magnetgeo.MSite import MSite
+# from python_magnetgeo.Insert import Insert
+# from python_magnetgeo.MSite import MSite
 from python_magnetgeo.Bitter import Bitter
 from python_magnetgeo.Supra import Supra
 
-from .config import appenv, loadconfig, loadtemplates
+# from .config import appenv
+from .config import loadconfig, loadtemplates
 
 # from .objects import load_object, load_object_from_db
 from .objects import load_object
@@ -45,11 +43,14 @@ from .cfg import create_cfg
 from .jsonmodel import create_json
 
 from .insert import Insert_setup, Insert_simfile
-from .bitter import Bitter_setup, Bitter_simfile
+from .bitter import Bitter_setup
+
+# from .bitter import Bitter_simfile
 from .supra import Supra_setup, Supra_simfile
 
 from .file_utils import MyOpen, findfile, search_paths
-from .units import load_units, convert_data
+
+# from .units import load_units, convert_data
 from glob import glob
 
 from .node import NodeSpec
@@ -147,9 +148,9 @@ def magnet_setup(
         f"Load magnet: mname={mname}, cad={cad.name}, innerbore={innerbore}, outerbore={outerbore}"
     )
 
-    prefix = ""
-    if mname:
-        prefix = f"{mname}_"
+    # prefix = ""
+    # if mname:
+    #     prefix = f"{mname}_"
 
     if "Helix" in confdata:
         print(f"Load an insert: mname={mname}")
@@ -475,7 +476,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
                     # why do I need that???
                     try:
                         findfile(confdata["geom"], search_paths(MyEnv, "geom"))
-                    except FileNotFoundError as e:
+                    except FileNotFoundError:
                         pass
 
         [mname] = currents.keys()
@@ -497,7 +498,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         # why do I need that???
         try:
             findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom"))
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             if args.debug:
                 print("confdata:", confdata)
             yamldata = {"name": confdata["name"]}
@@ -567,9 +568,9 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     jsonfile += "-sim.json"
     cfgfile = jsonfile.replace(".json", ".cfg")
 
-    addAir = False
-    if "mag" in args.model or "mqs" in args.model:
-        addAir = True
+    # addAir = False
+    # if "mag" in args.model or "mqs" in args.model:
+    #     addAir = True
 
     # retreive xaofile and meshfile
     xaofile = cad_basename + ".xao"

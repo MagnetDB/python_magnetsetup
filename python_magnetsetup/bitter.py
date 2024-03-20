@@ -221,6 +221,7 @@ def Bitter_setup(
     currentH_data = []
     powerH_data = []
     meanT_data = []
+    Displ_data = []
     Stress_data = []
     VonMises_data = []
 
@@ -245,6 +246,12 @@ def Bitter_setup(
         meanT_data.append(
             {
                 "header": f"T_{name}",
+                "markers": {"name": f"{name}_B%1%", "index1": index_ABitters},
+            }
+        )
+        Displ_data.append(
+            {
+                "header": f"Displ_{name}",
                 "markers": {"name": f"{name}_B%1%", "index1": index_ABitters},
             }
         )
@@ -339,7 +346,7 @@ def Bitter_setup(
             },
             {
                 "prefix": f"{name}_Slit%1_1%",
-                "markers": f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]',
+                "markers": f'["{name}_Slit%1_1%_l","{name}_Slit%1_1%_r"]',
                 "hw": f"hw_{bcname}",
                 "Tw": f"Tw_{bcname}",
                 "dTw": f"dTw_{bcname}",
@@ -359,6 +366,7 @@ def Bitter_setup(
             },
         ],
         "T": meanT_data,
+        "Displ": Displ_data,
         "Stress": Stress_data,
         "VonMises": VonMises_data,
     }

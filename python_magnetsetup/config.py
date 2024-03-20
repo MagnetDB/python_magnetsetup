@@ -189,13 +189,13 @@ def check_templates(templates: dict):
     for key in templates:
         if isinstance(templates[key], str):
             print(f"{key}: {templates[key]}")
-            with open(templates[key], "r") as f:
+            with open(templates[key], "r"):
                 pass
 
         elif isinstance(templates[key], str):
             for s in templates[key]:
                 print(f"{key}: {s}")
-                with open(s, "r") as f:
+                with open(s, "r"):
                     pass
     print("==========================")
 
@@ -204,27 +204,28 @@ def check_templates(templates: dict):
 
 def supported_models(Appcfg, method: str, geom: str, time: str) -> list:
     """
-    get supported models by method as a dict
+    get supported models by method as a list
     """
 
     models = []
-    # print(f'supported_models[{method}]: {Appcfg[method]}')
     if Appcfg[method][time]:
         if geom in Appcfg[method][time]:
             for key in Appcfg[method][time][geom]:
                 models.append(key)
+    print(f"supported_models[{method}]: {models}", flush=True)
 
     return models
 
 
 def supported_methods(Appcfg) -> list:
     """
-    get supported methods as a dict
+    get supported methods as a list
     """
 
     methods = []
     for key in Appcfg:
-        if Appcfg[key] and not key in ["mesh", "post"]:
+        if Appcfg[key] and key not in ["mesh", "post"]:
             methods.append(key)
 
+    print(f"supported_methods: {methods}", flush=True)
     return methods
