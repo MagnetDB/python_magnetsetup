@@ -903,7 +903,7 @@ def create_models_insert(
 
 def create_bcs_supra(
     boundary_meca: list,
-    boundary_maxwell: ist,
+    boundary_maxwell: list,
     boundary_electric: list,
     gdata: tuple,
     confdata: dict,
