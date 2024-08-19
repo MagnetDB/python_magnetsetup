@@ -124,10 +124,9 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature"],
+				"fields":["all"],
 				"expr":
 				{
-		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
 						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
@@ -136,7 +135,8 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
@@ -231,7 +231,7 @@
         				"markers": {{magnet_parts}}
 					},
 					{{/T_magnet}}
-					"Stat_T": 
+					"Stat_Temperature": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
