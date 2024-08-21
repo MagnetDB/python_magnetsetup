@@ -30,7 +30,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     if debug: print("HMagnet:", data)
 
     # how to create Tubes??
-    #Tube(const int n= len(struct.axi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.axi.h??)
+    #Tube(const int n= len(struct.modelaxi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.modelaxi.h??)
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -42,18 +42,18 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
         geom = helix["geom"]
         with MyOpen(geom, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-        nturns = len(cad.axi.turns)
+        nturns = len(cad.modelaxi.turns)
         if debug:
             print("nturns:", nturns)
         r1 = cad.r[0]
         r2 = cad.r[1]
-        h = cad.axi.h
+        h = cad.modelaxi.h
         Tube = mt.Tube(nturns, r1*1.e-3, r2*1.e-3, h*1.e-3)
         Tube.set_index(index)
         if debug:
             print("index:", index, Tube.get_index())
-            print("cad.axi:", cad.axi)
-        for (n, pitch) in zip(cad.axi.turns,cad.axi.pitch):
+            print("cad.modelaxi:", cad.modelaxi)
+        for (n, pitch) in zip(cad.modelaxi.turns,cad.modelaxi.pitch):
             Tube.set_pitch(pitch*1.e-3)
             Tube.set_nturn(n)
 
@@ -86,9 +86,9 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
         
     r1 = struct.r[0]*1.e-3
     r2 = struct.r[1]*1.e-3
-    z = -struct.axi.h*1.e-3
+    z = -struct.modelaxi.h*1.e-3
 
-    for (n, pitch) in zip(struct.axi.turns, struct.axi.pitch):
+    for (n, pitch) in zip(struct.modelaxi.turns, struct.modelaxi.pitch):
         dz = n * pitch*1.e-3
         f = 1/float(n) # struct.getFillingFactor()
         if f != 1:
@@ -225,7 +225,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
                     cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
     
                 if isinstance(cad, Bitter):
-                    fillingfactor = 1/cad.axi.get_Nturns()
+                    fillingfactor = 1/cad.modelaxi.get_Nturns()
                     tmp = BMagnet(cad, obj["material"], fillingfactor, debug)
                     for item in tmp:
                         BMagnets.append(item)

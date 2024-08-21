@@ -61,7 +61,7 @@ def Insert_simfile(
 
             # TODO: get _salome.data if they exist otherwise ??
             try:
-                if hhelix.m3d.with_shapes:
+                if hhelix.model3d.with_shapes:
                     with MyOpen(
                         hhelix.name + str("_cut_with_shapes_salome.dat"),
                         "r",
@@ -165,8 +165,8 @@ def Insert_setup(
             cad.Helices[i] + ".yaml", "r", paths=search_paths(MyEnv, "geom")
         ) as f:
             hhelix = yaml.load(f, Loader=yaml.FullLoader)
-            pitch_h.append(hhelix.axi.pitch)
-            turns_h.append(hhelix.axi.turns)
+            pitch_h.append(hhelix.modelaxi.pitch)
+            turns_h.append(hhelix.modelaxi.turns)
 
         if method_data[2] == "Axi":
             part_insulator = []

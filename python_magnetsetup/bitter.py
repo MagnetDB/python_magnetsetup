@@ -67,7 +67,7 @@ def Bitter_setup(
     if debug:
         print(f"Bitter_setup/Bitter yamlfile: {yamlfile}")
 
-    NSections = len(cad.axi.turns)
+    NSections = len(cad.modelaxi.turns)
     if debug:
         print(f"cad: {cad} tpe: {type(cad)}")
 
@@ -75,7 +75,7 @@ def Bitter_setup(
     snames = []
     name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
     if method_data[2] == "Axi":
-        if cad.z[0] < -cad.axi.h:
+        if cad.z[0] < -cad.modelaxi.h:
             snames.append(f"{name}_B0")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
@@ -83,7 +83,7 @@ def Bitter_setup(
             snames.append(f"{name}_B{i+1}")
             part_electric.append(snames[-1])
             part_thermic.append(snames[-1])
-        if cad.z[1] > cad.axi.h:
+        if cad.z[1] > cad.modelaxi.h:
             snames.append(f"{name}_B{NSections+1}")
             part_thermic.append(snames[-1])
             ignore_index.append(len(snames) - 1)
@@ -121,7 +121,7 @@ def Bitter_setup(
     gdata = (
         name,
         snames,
-        cad.axi.turns,
+        cad.modelaxi.turns,
         NCoolingSlits,
         Dh,
         Sh,
@@ -418,15 +418,15 @@ def Bitter_setup(
                 sigma = float(mat["sigma0"])
             else:
                 sigma = float(mat["sigma"])
-            I_s = I0 * cad.axi.turns[j]
+            I_s = I0 * cad.modelaxi.turns[j]
             j1 = I_s / (
                 math.log(cad.r[1] / cad.r[0])
                 * (cad.r[0] * 1.0e-3)
-                * (cad.axi.pitch[j] * 1.0e-3)
-                * cad.axi.turns[j]
+                * (cad.modelaxi.pitch[j] * 1.0e-3)
+                * cad.modelaxi.turns[j]
             )
             U_s = 2 * math.pi * (cad.r[0] * 1.0e-3) * j1 / sigma
-            # print("U=", params[index]['name'], cad.r[0], cad.axi.pitch[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
+            # print("U=", params[index]['name'], cad.r[0], cad.modelaxi.pitch[j], mat['sigma'], "U_s=", U_s, "j1=", j1)
             item = {"name": f"U_{marker}", "value": str(U_s)}
             params[index] = item
 
