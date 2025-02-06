@@ -121,3 +121,4 @@ log*
 *.hdf
 *.orig
 *.old
+.DS_Store
