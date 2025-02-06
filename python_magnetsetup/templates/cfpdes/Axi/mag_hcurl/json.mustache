@@ -77,9 +77,9 @@
 		{
 	    	"Exports":
 	    	{
+				"fields":["all"],
 				"expr":
 				{
-		    		"atheta":"magnetic_Atheta:magnetic_Atheta",
 		    		"B":
 		    		{
 						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
@@ -88,13 +88,19 @@
 					"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
 						"expr":"-materials_sigma*materials_U/(2*pi*x):materials_sigma:materials_U:x",
 						"markers": {{part_electric}}
-		    		}
+		    		},
+		    		"sigma":
+		    		{
+						"expr":"materials_sigma:materials_sigma",
+						"markers": {{part_electric}}
+					}
 				}
 	    	}
 		},

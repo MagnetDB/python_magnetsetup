@@ -91,6 +91,7 @@
 				{{#boundary_Therm_Robin}}
 				"{{name}}": 
 				{ 
+					"markers":{{markers}},
 					"expr1": "{{expr1}}",
 					"expr2": "{{expr2}}"
 				},
@@ -123,7 +124,7 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature"],
+				"fields":["heat.temperature", "pid"],
 				"expr":
 				{
 		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
@@ -135,7 +136,8 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
@@ -146,7 +148,17 @@
 		    		{
 						"expr":"materials_sigma*(materials_U/(2*pi)+magnetic_dphi_dt)*(materials_U/(2*pi+magnetic_dphi_dt)):x:materials_sigma:materials_U:magnetic_dphi_dt",
 						"markers": {{part_electric}}
-		    		}
+		    		},
+		    		"sigma":
+		    		{
+						"expr":"materials_sigma:materials_sigma",
+						"markers": {{part_electric}}
+					},
+		    		"k":
+		    		{
+						"expr":"materials_k:materials_k",
+						"markers": {{part_electric}}
+					}
 				}
 	    	}
 		},
@@ -219,7 +231,7 @@
         				"markers": {{magnet_parts}}
 					},
 					{{/T_magnet}}
-					"Stat_T": 
+					"Stat_Temperature": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 

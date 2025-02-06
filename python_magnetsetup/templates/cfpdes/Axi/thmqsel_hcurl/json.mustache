@@ -121,6 +121,7 @@
 				{{#boundary_Therm_Robin}}
 				"{{name}}":
 				{
+					"markers":{{markers}},
 					"expr1": "{{expr1}}",
 					"expr2": "{{expr2}}"
 				},
@@ -165,10 +166,9 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature","elastic1.displacement"],
+				"fields":["heat.temperature","magnetic.Atheta","elastic1.displacement","pid"],
 				"expr":
 				{
-		    		"atheta":"magnetic_Atheta:magnetic_Atheta:x",
 		    		"B":
 		    		{
 						"expr":"{-magnetic_grad_Atheta_1,magnetic_grad_Atheta_0+magnetic_Atheta/x}:magnetic_Atheta:magnetic_grad_Atheta_0:magnetic_grad_Atheta_1:x",
@@ -177,7 +177,8 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
@@ -224,6 +225,16 @@
 						"expr": "elastic1_u_0/x:x:elastic1_u_0",
 						"markers": {{part_thermic}},
 						"representation":["element"]
+					},
+		    		"sigma":
+		    		{
+						"expr":"materials_sigma:materials_sigma",
+						"markers": {{part_electric}}
+					},
+		    		"k":
+		    		{
+						"expr":"materials_k:materials_k",
+						"markers": {{part_electric}}
 					}
 				}
 	    	}
@@ -297,7 +308,7 @@
         				"markers": {{magnet_parts}}
 					},
 					{{/T_magnet}}
-					"Stat_T": 
+					"Stat_Temperature": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
@@ -343,27 +354,6 @@
 				"Fields":
 				{
 		    		"names":["speed"]
-				}
-	    	},
-	    	"Measures":
-	    	{
-				"Statistics":
-				{
-		    		"Stat_Displ": 
-		    		{
-						"type":["min","max","mean"], 
-						"field":"displacement" 
-		    		},
-		    		"Stat_Stress": 
-		    		{
-						"type":["min","max","mean"], 
-						"expr":"materials_stress_thth:materials_stress_thth" 
-		    		},
-		    		"Stat_VonMises": 
-		    		{
-						"type":["min","max","mean"], 
-						"expr":"sqrt(1/2*((materials_stress1-materials_stress2)*(materials_stress1-materials_stress2)+(materials_stress2-materials_stress3)*(materials_stress2-materials_stress3)+(materials_stress1-materials_stress3)*(materials_stress1-materials_stress3))):materials_stress1:materials_stress2:materials_stress3"
-		    		}
 				}
 	    	}
 		}

@@ -151,7 +151,7 @@
 		{
 	    	"Exports":
 	    	{
-				"fields":["heat.temperature","elastic.displacement"],
+				"fields":["heat.temperature","elastic.displacement", "pid"],
 				"expr":
 				{
 		    		"atheta":"magnetic_phi/x:magnetic_phi:x",
@@ -163,7 +163,8 @@
 		    		"U":
 		    		{
 						"expr":"materials_U:materials_U",
-						"markers": {{part_electric}}
+						"markers": {{part_electric}},
+						"representation":["element"]
 		    		},
 		    		"Jth":
 		    		{
@@ -204,12 +205,22 @@
 						"markers": {{part_thermic}},
 						"representation":["element"]
 		    		},
-				"HoopStrain":
-				{
-						"expr": "elastic_u_0/x:x:elastic_u_0",
-						"markers": {{part_thermic}},
-						"representation":["element"]
-				}
+					"HoopStrain":
+					{
+							"expr": "elastic_u_0/x:x:elastic_u_0",
+							"markers": {{part_thermic}},
+							"representation":["element"]
+					},
+		    		"sigma":
+		    		{
+						"expr":"materials_sigma:materials_sigma",
+						"markers": {{part_electric}}
+					},
+		    		"k":
+		    		{
+						"expr":"materials_k:materials_k",
+						"markers": {{part_electric}}
+					}
 				}
 	    	}
 		},
@@ -282,7 +293,7 @@
         				"markers": {{magnet_parts}}
 					},
 					{{/T_magnet}}
-					"Stat_T": 
+					"Stat_Temperature": 
 		    		{
 						"type":["min","max","mean"], 
 						"field":"temperature" 
