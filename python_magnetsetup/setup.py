@@ -643,6 +643,52 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
 
     return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles)  # , tarfilename)
 
+def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
+    """
+    generate sim files for commissiong
+    """
+    import copy
+
+    print(f"commissioning_setup: args={args} (type={args}), currents={currents}")
+
+    # loadconfig
+    AppCfg = loadconfig()
+
+    # Get current dir
+    cwd = os.getcwd()
+    if args.wd:
+        os.chdir(args.wd)
+    print(f"commissioning_setup/main: {os.getcwd()}")
+
+    if args.geom ==  "3D":
+        raise RuntimeError(f"commissioning_setup for 3D geometries not implemented yet")
+    
+    # call setup for several scenario corresponding to cooling
+    heatcorrelations = [args.hcorrelation]
+    if args.hcorrelation == "all":
+        heatcorrelations = ["Montgomery", "Dittus", "Colburn", "Silverberg"]
+
+    frictions = [args.frictions]
+    if args.friction == "all":
+        frictions = ["Constant", "Blasius", "Filonenko", "Colebrook", "Swanee"]
+
+    coolings = [args.cooling]
+    if args.cooling == "all":
+        coolings = ["mean", "meanH", "grad", "gradH", "gradHZ", "gradHZH"]
+        
+    commissiong_data = {}
+    for heatcorrelation in heatcorrelations:
+        for cooling in coolings:
+            for friction in frictions:
+                setup_args = copy.deepcopy(args)
+                setup_args.cooling = cooling
+                setup_args.frictions = friction
+                setup_args.hcorrelation = heatcorrelation
+                setup_args.wd = f"{args.wd}/{cooling}/{friction}/{heatcorrelation}"
+                (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = setup(MyEnv, setup_args, confdata, jsonfile, currents, session)
+                commissioning_setup[setup_args.wd] = (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles)
+
+    return commissiong_data
 
 def setup_cmds(
     MyEnv,
@@ -728,7 +774,7 @@ def setup_cmds(
         meshcmd = f"python3 -m python_magnetgmsh.xao2msh {xaofile} --wd data/geometries --geo {yamlfile} mesh --group CoolingChannels"
 
         # or use gmsh api (do not support Supra with details)
-        # meshcmd = f"python3 -m python_magnetgmsh.cli {yamlfile} --wd data/geometries --tickslit --mesh --group CoolingChannels"
+        # meshcmd = f"python3 -m python_magnetgmsh.cli {yamlfile} --wd data/geometries --thickslit --mesh --group CoolingChannels"
 
     else:
         gmshfile = meshfile.replace(".med", ".msh")
@@ -802,7 +848,8 @@ def setup_cmds(
 
     paraview = AppCfg["post"]["paraview"]
 
-    # get expr and exprlegend from method/model/...
+    # change to use hifimagnet.paraview stuff
+    # # get expr and exprlegend from method/model/...
     if "post" in AppCfg[args.method][args.time][args.geom][args.model]:
         postdata = AppCfg[args.method][args.time][args.geom][args.model]["post"]
 
@@ -823,5 +870,98 @@ def setup_cmds(
 
     # TODO what about postprocess??
     # TODO get results (value.csv, png, raw data) to magnetdb
+
+    return cmds
+
+def commissioning_cmds(
+    MyEnv,
+    args,
+    node_spec: NodeSpec,
+    commissioning_data: dict,
+    root_directory: str,
+    currents: dict,
+    ):
+    """
+    create cmds for commissioning
+    """
+    import copy
+
+    # loadconfig
+    AppCfg = loadconfig()
+
+    # TODO adapt NP to the size of the problem
+    # if server is SMP mpirun outside otherwise inside singularity
+    NP = node_spec.cores
+    print(f"NP={NP}")
+    if node_spec.multithreading:
+        NP = int(NP / 2)
+        print(f"NP={NP} multithreading on")
+    if args.debug:
+        print(f"NP={NP} {type(NP)}")
+    if args.np > 0:
+        if args.np > NP:
+            print(
+                f"requested number of cores {args.np} exceed {node_spec.name} capability (max: {NP})"
+            )
+            print(f"keep {NP} cores")
+        else:
+            NP = args.np
+    print(f"NP={NP}, args.np={args.np}")
+
+    simage_path = MyEnv.simage_path()
+    feelpp = AppCfg[args.method]["feelpp"]
+
+    # create mdata from currents only once
+    keys = list(commissioning_data)
+    cfgfile = commissioning_data[keys[0]][1]
+
+    mdata = {}
+
+    # call setup for several scenario corresponding to cooling
+    heatcorrelations = [args.hcorrelation]
+    if args.hcorrelation == "all":
+        heatcorrelations = ["Montgomery", "Dittus", "Colburn", "Silverberg"]
+
+    frictions = [args.frictions]
+    if args.friction == "all":
+        frictions = ["Constant", "Blasius", "Filonenko", "Colebrook", "Swanee"]
+
+    coolings = [args.cooling]
+    if args.cooling == "all":
+        coolings = ["mean", "meanH", "grad", "gradH", "gradHZ", "gradHZH"]
+ 
+    # workflow matrix
+    pyfeel = " -m  python_magnetworkflows.run commissioning"  # fix-current, commisioning, fixcooling
+    pyfeel_args = f"--cfgfile {keys[0]}/{cfgfile}"
+    pyfeel_args += f" --mdata {mdata}"
+    pyfeel_args += f" --coolings {coolings}"
+    pyfeel_args += f" --hcorrelations {heatcorrelations}"
+    pyfeel_args += f" --frictions {frictions}"
+    
+    cmds = {}
+    for key in commissioning_data:
+        basedir, cooling, friction, heatcorrelation = key.split("/")
+        setup_args = copy.deepcopy(args)
+        setup_args.cooling = cooling
+        setup_args.frictions = friction
+        setup_args.hcorrelation = heatcorrelation
+        setup_args.wd = f"{args.wd}/{cooling}/{friction}/{heatcorrelation}"
+        (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = commissioning_data[key]
+        sub_cmds = setup_cmds(MyEnv, setup_args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles, root_directory, currents)
+        print(f'{key}: sub_cmds={list(sub_cmds.keys())}')
+        # shall remove run and workflow from sub_cmds
+
+    pyfeelcmd = f"python {pyfeel} {cfgfile} {pyfeel_args}"
+    if node_spec.smp:
+        pyfeelcmd = f"mpirun -np {NP} {pyfeelcmd}"
+        cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+    else:
+        cmds[
+            "Workflow"
+        ] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+
+    # to be fixed
+    # result_dir = f"{root_directory}/feelppdb/np_{NP}"
+    # print(f"result_dir={result_dir}")
 
     return cmds
