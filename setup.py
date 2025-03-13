@@ -7,7 +7,15 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
+requirements = [
+    'fabric',
+    'Pint',
+    'python-decouple',
+    'requests==2.*,>=2.27.1',
+    'chevron>=0.14.0',
+    'PyYAML>=5.0',
+    'python_magnetgeo'
+]
 
 setup_requirements = [ ]
 
@@ -29,18 +37,18 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     description="Python Magnet SetUp to create json and cfg files for simulation",
-    entry_points={
-        'console_scripts': [
-            'python_magnetsetup=python_magnetsetup.setup:main',
-        ],
-    },
+    # entry_points={
+    #     'console_scripts': [
+    #         'python_magnetsetup=python_magnetsetup.setup:main',
+    #     ],
+    # },
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
     include_package_data=True,
     keywords='python_magnetsetup',
     name='python_magnetsetup',
-    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*', 'python_magnetsetup.workflows.*', 'python_magnetsetup.postprocessing.*']),
+    packages=find_packages(include=['python_magnetsetup', 'python_magnetsetup.*', 'python_magnetsetup.postprocessing.*']),
     package_data={'': [
         'settings.env', 
         'flow_params.json', 

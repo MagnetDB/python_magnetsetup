@@ -1,6 +1,7 @@
 {
     "{{name}}":
 {
+    "markers":{{part_mat_conductor}},
     "alpha":"{{alpha}}",
 
     "sigma0":"{{ElectricalConductivity}}",
@@ -11,8 +12,8 @@
 
     "mu": "{{MagnetPermeability}}*mu0:mu0",
 
-    "U":"U_{{name}}:U_{{name}}",
+    "U":"meshes_cfpdes_fields_U:meshes_cfpdes_fields_U",
 
-    "filename":"$cfgdir/conductor-cfpdes-thmag_hcurl-Axi.json"
+    "j_th":"-sigma*U/2/pi/x:sigma:U:x"
 }
 }
