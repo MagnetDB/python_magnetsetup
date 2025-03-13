@@ -1161,6 +1161,7 @@ def create_json(
     if debug:
         print("create_json jsonfile=", jsonfile)
         print("create_json mdict=", mdict)
+
     data = entry(templates["model"], mdict, debug)
     if debug:
         print(f"create_json/data model: {data}")
@@ -1296,8 +1297,6 @@ def entry(template: str, rdata: list, debug: bool = False) -> str:
         print("entry/rdata:", rdata)
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
-    with open("/home/feelpp/test/json.json", "w") as f:
-        f.write(jsonfile)
     jsonfile = jsonfile.replace("'", '"')
     # print("jsonfile:", jsonfile)
 
@@ -1311,8 +1310,6 @@ def entry(template: str, rdata: list, debug: bool = False) -> str:
         print(f"entry/jsonfile: {jsonfile}")
         print(f"corrected: {corrected}")
 
-    with open("/home/feelpp/test/corrected.json", "w") as f:
-        f.write(corrected)
     try:
         mdata = json.loads(corrected)
     except json.decoder.JSONDecodeError:

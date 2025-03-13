@@ -4,6 +4,7 @@ import copy
 
 from python_magnetgeo.Insert import Insert
 
+from .flatten import flatten
 from .jsonmodel import (
     create_params_insert,
     create_params_csvfiles_insert,
@@ -194,14 +195,12 @@ def Insert_setup(
                 part_thermic.append(insulator_name)
 
     if method_data[2] == "Axi":
-        import numpy as np
-
-        part_electric = part_electric + list(np.concatenate(part_mat_conductors).flat)
+        part_electric = part_electric + flatten(part_mat_conductors)
         if "th" in method_data[3]:
             part_thermic = (
                 part_thermic
                 + part_electric
-                + list(np.concatenate(part_mat_insulators).flat)
+                + list(flatten(part_mat_insulators))
             )
 
     for i in range(NRings):
