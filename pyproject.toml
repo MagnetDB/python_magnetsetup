@@ -10,7 +10,7 @@ authors = ["Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>",
 
 [tool.poetry.dependencies]
 python = "^3.11"
-python-magnetgeo = {path = "../python_magnetgeo"}
+python-magnetgeo = {path = "../python_magnetgeo", develop=true}
 fabric = "^2.7.0"
 Pint = "^0.24"
 python-decouple = "^3.6"

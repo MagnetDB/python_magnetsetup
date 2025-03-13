@@ -1,0 +1,8 @@
+python_magnetgeo
+fabric>=2.7.0
+Pint>=0.18
+requests>=2.27.1
+chevron>=0.13.1
+PyYAML>=6.0
+python-decouple>=3.6
+
