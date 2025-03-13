@@ -662,7 +662,7 @@ def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, se
 
     if args.geom ==  "3D":
         raise RuntimeError(f"commissioning_setup for 3D geometries not implemented yet")
-    
+
     # call setup for several scenario corresponding to cooling
     heatcorrelations = [args.hcorrelation]
     if args.hcorrelation == "all":
@@ -675,7 +675,7 @@ def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, se
     coolings = [args.cooling]
     if args.cooling == "all":
         coolings = ["mean", "meanH", "grad", "gradH", "gradHZ", "gradHZH"]
-        
+
     commissiong_data = {}
     for heatcorrelation in heatcorrelations:
         for cooling in coolings:
@@ -735,7 +735,7 @@ def setup_cmds(
     simage_path = MyEnv.simage_path()
     hifimagnet = AppCfg["mesh"]["hifimagnet"]
     salome = AppCfg["mesh"]["salome"]
-    gmsh = AppCfg["mesh"]["gmsh"]
+    gmsh = AppCfg["mesh"]["gsmh"]
     feelpp = AppCfg[args.method]["feelpp"]
     partitioner = AppCfg["mesh"]["partitioner"]
     if "exec" in AppCfg[args.method]:
@@ -929,7 +929,7 @@ def commissioning_cmds(
     coolings = [args.cooling]
     if args.cooling == "all":
         coolings = ["mean", "meanH", "grad", "gradH", "gradHZ", "gradHZH"]
- 
+
     # workflow matrix
     pyfeel = " -m  python_magnetworkflows.run commissioning"  # fix-current, commisioning, fixcooling
     pyfeel_args = f"--cfgfile {keys[0]}/{cfgfile}"
@@ -937,7 +937,7 @@ def commissioning_cmds(
     pyfeel_args += f" --coolings {coolings}"
     pyfeel_args += f" --hcorrelations {heatcorrelations}"
     pyfeel_args += f" --frictions {frictions}"
-    
+
     cmds = {}
     for key in commissioning_data:
         basedir, cooling, friction, heatcorrelation = key.split("/")
