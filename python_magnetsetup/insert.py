@@ -43,74 +43,63 @@ def Insert_simfile(
     except:
         pass
 
-    for helix in cad.Helices:
-        with MyOpen(helix + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-            hhelix = yaml.load(f, Loader=yaml.FullLoader)
+    for helix in cad.helices:
+        with MyOpen(helix.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
             files.append(f.name)
 
-            # TODO: get xao and brep if they exist otherwise _salome.data
-            try:
-                xaofile = hhelix.name + ".xao"
-                f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
-                files.append(f)
+        # TODO: get xao and brep if they exist otherwise _salome.data
+        xaofile = helix.name + ".xao"
+        f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+        files.append(f)
 
-                brepfile = hhelix.name + ".brep"
-                f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
-                files.append(f)
-            except:
-                pass
+        brepfile = helix.name + ".brep"
+        f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+        files.append(f)
 
-            # TODO: get _salome.data if they exist otherwise ??
-            try:
-                if hhelix.model3d.with_shapes:
-                    with MyOpen(
-                        hhelix.name + str("_cut_with_shapes_salome.dat"),
-                        "r",
-                        paths=search_paths(MyEnv, "geom"),
-                    ) as fcut:
-                        files.append(fcut.name)
-                    with MyOpen(
-                        hhelix.shape.profile, "r", paths=search_paths(MyEnv, "geom")
-                    ) as fshape:
-                        files.append(fshape.name)
-                else:
-                    with MyOpen(
-                        hhelix.name + str("_cut_salome.dat"),
-                        "r",
-                        paths=search_paths(MyEnv, "geom"),
-                    ) as fcut:
-                        files.append(fcut.name)
-            except:
-                pass
+        # TODO: get _salome.data if they exist otherwise ??
+        if helix.model3d.with_shapes:
+            with MyOpen(
+                helix.name + str("_cut_with_shapes_salome.dat"),
+                "r",
+                paths=search_paths(MyEnv, "geom"),
+            ) as fcut:
+                files.append(fcut.name)
+            with MyOpen(
+                helix.shape.profile, "r", paths=search_paths(MyEnv, "geom")
+            ) as fshape:
+                files.append(fshape.name)
+        else:
+            with MyOpen(
+                helix.name + str("_cut_salome.dat"),
+                "r",
+                paths=search_paths(MyEnv, "geom"),
+            ) as fcut:
+                files.append(fcut.name)
 
-    for ring in cad.Rings:
-        with MyOpen(ring + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+    for ring in cad.rings:
+        with MyOpen(ring.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
             files.append(f.name)
-        try:
-            xaofile = ring.name + ".xao"
+        
+        xaofile = ring.name + ".xao"
+        f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
+        files.append(f)
+
+        brepfile = ring.name + ".brep"
+        f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
+        files.append(f)
+
+    if cad.currentleads:
+        for lead in cad.currentleads:
+            with MyOpen(lead.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+                files.append(f.name)
+            
+            xaofile = lead.name + ".xao"
             f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
             files.append(f)
 
-            brepfile = ring.name + ".brep"
+            brepfile = lead.name + ".brep"
             f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
             files.append(f)
-        except:
-            pass
-
-    if cad.CurrentLeads:
-        for lead in cad.CurrentLeads:
-            with MyOpen(lead + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
-                files.append(f.name)
-            try:
-                xaofile = lead.name + ".xao"
-                f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
-                files.append(f)
-
-                brepfile = lead.name + ".brep"
-                f = findfile(brepfile, paths=search_paths(MyEnv, "cad"))
-                files.append(f)
-            except:
-                pass
 
     return files
 
@@ -160,14 +149,10 @@ def Insert_setup(
     if mname:
         prefix = f"{mname}_"
 
-    for i in range(NHelices):
+    for i,helix in enumerate(cad.helices):
         part_helix = []
-        with MyOpen(
-            cad.Helices[i] + ".yaml", "r", paths=search_paths(MyEnv, "geom")
-        ) as f:
-            hhelix = yaml.load(f, Loader=yaml.FullLoader)
-            pitch_h.append(hhelix.modelaxi.pitch)
-            turns_h.append(hhelix.modelaxi.turns)
+        pitch_h.append(helix.modelaxi.pitch)
+        turns_h.append(helix.modelaxi.turns)
 
         if method_data[2] == "Axi":
             part_insulator = []
@@ -188,7 +173,7 @@ def Insert_setup(
             if "th" in method_data[3]:
                 part_thermic.append(f"{prefix}H{i+1}")
 
-            (insulator_name, insulator_number) = hhelix.insulators()
+            (insulator_name, insulator_number) = helix.insulators()
             insulator_name = f"{prefix}{insulator_name}"
             index_Insulators.append((insulator_name, insulator_number))
             if "th" in method_data[3]:
