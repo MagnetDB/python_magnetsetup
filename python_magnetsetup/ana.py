@@ -15,7 +15,7 @@ from python_magnetgeo.Insert import Insert
 from python_magnetgeo.MSite import MSite
 from python_magnetgeo.Bitter import Bitter
 from python_magnetgeo.Supra import Supra
-from python_magnetgeo.SupraStructure import HTSinsert
+from python_magnetgeo.SupraStructure import HTSInsert
 
 from .file_utils import MyOpen, findfile, search_paths
 
@@ -124,7 +124,7 @@ def UMagnet(struct: Supra, debug: bool=False):
     return mt.UnifMagnet(struct.r1*1.e-3, struct.r0*1.e-3, struct.h*1.e-3, j, struct.z0, f, rho)
 
 
-def UMagnets(struct: HTSinsert, detail: str ="dblepancake", debug: bool=False):
+def UMagnets(struct: HTSInsert, detail: str ="dblepancake", debug: bool=False):
     """
     create view of this insert as a stack of Uniform Magnets
 
