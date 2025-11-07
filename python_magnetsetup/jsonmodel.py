@@ -966,7 +966,7 @@ def create_bcs_bitter(
             markers = f'["{name}_Slit{i}"]'
             if method_data[2] == "Axi":
                 if i != 0 and i != NCoolingSlits + 1:
-                    markers = f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]'
+                    markers = f'["{name}_Slit{i}"]'
 
             # change template
             # add: %1_1%: s, %1_2%: nslit, %1_3%: slit.r, %1_4%: rslit

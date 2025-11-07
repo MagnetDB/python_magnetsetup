@@ -282,7 +282,7 @@ def Bitter_setup(
         if method_data[2] == "Axi":
             filling_factor = fillingfactor[i]  # get filling factor from magnetgeo??
             if i != 0 and i != NCoolingSlits + 1:
-                markers = f'["{name}_Slit{i}_l","{name}_Slit{i}_r"]'
+                markers = f'["{name}_Slit{i}"]'
             flux_data.append([i, filling_factor])
 
         index_data = []
@@ -346,7 +346,7 @@ def Bitter_setup(
             },
             {
                 "prefix": f"{name}_Slit%1_1%",
-                "markers": f'["{name}_Slit%1_1%_l","{name}_Slit%1_1%_r"]',
+                "markers": f'["{name}_Slit%1_1%"]',
                 "hw": f"hw_{bcname}",
                 "Tw": f"Tw_{bcname}",
                 "dTw": f"dTw_{bcname}",
