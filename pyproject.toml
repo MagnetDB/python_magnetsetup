@@ -10,6 +10,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "python-magnetgeo @ file:///../python_magnetgeo",
     "fabric>=2.7.0,<3.0.0",
     "Pint>=0.24,<0.25",
     "python-decouple>=3.6,<4.0",
@@ -17,20 +18,6 @@ dependencies = [
     "chevron>=0.13.1,<0.14.0",
     "PyYAML>=6.0,<7.0",
 ]
-
-[tool.poetry]
-name = "python_magnetsetup"
-version = "0.1.0"
-description = "Python helpers to setup and run HiFiMagnet simulations"
-authors = ["Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>",
-           "Romain Vallet <romain.vallet@lncmi.cnrs.fr>",
-           "Jeremie Muzet <jeremie.muzet@lncmi.cnrs.fr>",
-           "Remi Caumette <remicaumette@icloud.com>"
-          ]
-
-[tool.poetry.dependencies]
-python = "^3.11"
-python-magnetgeo = {path = "../python_magnetgeo", develop=true}
 
 [tool.poetry.group.dev.dependencies]
 
