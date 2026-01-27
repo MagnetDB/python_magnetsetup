@@ -59,9 +59,19 @@ from glob import glob
 
 from .node import NodeSpec
 
+# logging
+from .logging_config import setup_logging, get_logger, init_default_logging
+
+logger = get_logger(__name__)
+
 
 def magnet_simfile(
-    MyEnv, confdata: str, cad: Insert | Bitters | Supras, addAir: bool = False, debug: bool = False, session=None
+    MyEnv,
+    confdata: str,
+    cad: Insert | Bitters | Supras,
+    addAir: bool = False,
+    debug: bool = False,
+    session=None,
 ):
     """
     create sim files for magnet
@@ -87,10 +97,10 @@ def magnet_simfile(
                     yamlfile = obj["geom"]
                     with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as f:
                         files.append(f.name)
-                    
+
                     struct = Supra_simfile(MyEnv, obj, mcad)
                     if struct:
-                            files.append(struct)
+                        files.append(struct)
             case _:
                 raise Exception(f"magnet_simfile: unexpected cad type {type(cad)}")
 
@@ -112,8 +122,7 @@ def magnet_setup(
     """
 
     print(f"magnet_setup: mname={mname}")
-    if debug:
-        print(f"magnet_setup: confdata={confdata}"),
+    logger.debug(f"magnet_setup: confdata={confdata}"),
 
     mdict = {}
     mmat = {}
@@ -138,23 +147,41 @@ def magnet_setup(
             # if isinstance(cad, Bitter):
             for i, obj in enumerate(confdata["Bitter"]):
                 (mdict, mmat, mmodels, mpost) = Bitter_setup(
-                    MyEnv, mname, obj, cad.magnets[i], method_data, templates, current, debug
+                    MyEnv,
+                    mname,
+                    obj,
+                    cad.magnets[i],
+                    method_data,
+                    templates,
+                    current,
+                    debug,
                 )
-                (mdict, mmat, mmodels, mpost) = _setup(mname, "Bitter", cad.name, tdict, tmat, tmodels, tpost, debug)
+                (mdict, mmat, mmodels, mpost) = _setup(
+                    mname, "Bitter", cad.name, tdict, tmat, tmodels, tpost, debug
+                )
         case Supras():
             print(f"Load a Supras: mname={mname}")
             # if isinstance(cad, Supra):
             for i, obj in enumerate(confdata["Supra"]):
                 (tdict, tmat, tmodels, tpost) = Supra_setup(
-                    MyEnv, mname, obj, cad.magnets[i], method_data, templates, current, debug
+                    MyEnv,
+                    mname,
+                    obj,
+                    cad.magnets[i],
+                    method_data,
+                    templates,
+                    current,
+                    debug,
                 )
-                (mdict, mmat, mmodels, mpost) = _setup(mname, "Supra", cad.name, tdict, tmat, tmodels, tpost, debug)
+                (mdict, mmat, mmodels, mpost) = _setup(
+                    mname, "Supra", cad.name, tdict, tmat, tmodels, tpost, debug
+                )
         case _:
             raise Exception(f"magnet_setup: unexpected cad type {type(cad)}")
 
-    if debug:
-        print(f"magnet_setup: mdict={mdict}")
+    logger.debug(f"magnet_setup: mdict={mdict}")
     return (mdict, mmat, mmodels, mpost)
+
 
 def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
 
@@ -163,8 +190,7 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
     mmodels = {}
     mpost = {}
 
-    if debug:
-        print(f"tdict: {tdict}")
+    logger.debug(f"tdict: {tdict}")
     NMerge(
         tdict,
         mdict,
@@ -179,12 +205,10 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
     # print(f"magnet_setup: {mtype}, mname={mname}, mdict[power_magnet]={mdict['power_magnet']}")
     # list_name = [item['name'] for item in mdict['int_temp']]
 
-    if debug:
-        print(f"tmat: {tmat}")
+    logger.debug(f"tmat: {tmat}")
     NMerge(tmat, mmat, debug, name="magnet_setup Bitter/Supra mmat")
 
-    if debug:
-        print(f"tmodels: {tmodels}")
+    logger.debug(f"tmodels: {tmodels}")
     for physic in tmodels:
         if physic not in mmodels:
             mmodels[physic] = {}
@@ -195,28 +219,19 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
             name="magnet_setup Bitter/Supra mmodels ",
         )
 
-    if debug:
-        print(f"tpost: {tpost}")
-    NMerge(
-        tpost, mpost, debug, name="magnet_setup Bitter/Supra mpost"
-    )  # debug)
-    if debug:
-        print(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
-        print(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
+    logger.debug(f"tpost: {tpost}")
+    NMerge(tpost, mpost, debug, name="magnet_setup Bitter/Supra mpost")  # debug)
+    logger.debug(f"magnet_setup: {mtype}, mname={mname}, tpost={tpost}")
+    logger.debug(f"magnet_setup: {mtype}, mname={mname}, mpost={mpost}")
 
     for key in ["Current", "Power"]:
         list_current = []
         for item in mpost[key]:
             if isinstance(item, dict) and "part_electric" in item:
-                list_current = list(
-                    set(list_current + item["part_electric"])
-                )
+                list_current = list(set(list_current + item["part_electric"]))
         if list_current:
             mpost[key] = [{"part_electric": list_current}]
-            if debug:
-                print(
-                    f"magnet_setup {mname}: force mpost[{key}]={mpost[key]}"
-                )
+            logger.debug(f"magnet_setup {mname}: force mpost[{key}]={mpost[key]}")
 
     tdict.clear()
     tmat.clear()
@@ -250,13 +265,11 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
                 ]
             else:
                 mdict[key] = [{"name": _keys[0], "magnet_parts": _lists}]
-            if debug:
-                print(
-                    f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
-                )
+            logger.debug(
+                f"setup/magnet_setup mname={mname}: force mdict[{key}] to = {{'name': _keys[0], 'magnet_parts': _lists}}"
+            )
 
-    return (mdict, mmat, mmodels, mpost)          
-
+    return (mdict, mmat, mmodels, mpost)
 
 
 def msite_simfile(MyEnv, confdata: str, cad: MSite, addAir: bool = False, session=None):
@@ -303,10 +316,8 @@ def msite_setup(
     """
     Creating dict for setup for msite
     """
-    print(f"msite_setup: confdata={confdata}")
-    if debug:
-        print("msite_setup:", "confdata=", confdata)
-        print("msite_setup: confdata[magnets]=", confdata["magnets"])
+    logger.debug(f"msite_setup: confdata={confdata}")
+    logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
 
     mdict = {}
     mmat = {}
@@ -316,8 +327,7 @@ def msite_setup(
     for i, magnet in enumerate(confdata["magnets"]):
         mname = list(magnet.keys())[0]
         print(f"msite_setup: magnet_setup[{mname}]")
-        if debug:
-            print(f"msite_setup: magnet_setup[{mname}]: {magnet}, confdata={magnet}")
+        logger.debug(f"msite_setup: magnet_setup[{mname}]: {magnet}, confdata={magnet}")
 
         mconfdata = magnet[mname]
         mcad = cad.magnets[i]
@@ -328,22 +338,18 @@ def msite_setup(
         # print(f"msite_setup({mname}): tdict={tdict}")
         # print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
         # print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
-        if debug:
-            print(f"tpost[{mname}][Current]: {tpost['Current']}")
+        logger.debug(f"tpost[{mname}][Current]: {tpost['Current']}")
 
         NMerge(tdict, mdict, debug, name=f"msite_setup: merge(mdict,tdict) for {mname}")
-        # if debug:
-        # print("tdict[part_electric]:", tdict['part_electric'])
-        # print("tdict[part_thermic]:", tdict['part_thermic'])
-        # print("mdict[part_electric]:", mdict['part_electric'])
-        # print("mdict[part_thermic]:", mdict['part_thermic'])
+        # logger.debug("tdict[part_electric]:", tdict['part_electric'])
+        # logger.debug("tdict[part_thermic]:", tdict['part_thermic'])
+        # logger.debug("mdict[part_electric]:", mdict['part_electric'])
+        # logger.debug("mdict[part_thermic]:", mdict['part_thermic'])
 
         NMerge(tmat, mmat, debug, "msite_setup/tmat")
-        if debug:
-            print("mmat:", mmat)
+        logger.debug(f"mmat: {mmat}")
 
-        if debug:
-            print(f"tmodels: {tmodels}")
+        logger.debug(f"tmodels: {tmodels}")
         for physic in tmodels:
             if physic not in mmodels:
                 mmodels[physic] = {}
@@ -368,20 +374,15 @@ def msite_setup(
                     list_current = list(set(list_current + item["part_electric"]))
             if list_current:
                 mpost[key] = [{"part_electric": list_current}]
-                if debug:
-                    print(f"msite_setup {mname}: force mpost[{key}]={mpost[key]}")
-        if debug:
-            print("NewMerge:", mpost)
+                logger.debug(f"msite_setup {mname}: force mpost[{key}]={mpost[key]}")
+        logger.debug(f"NewMerge: {mpost}")
 
     # print(f"msite_setup: mdict={mdict}")
     # print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
     # print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
 
-    if debug:
-        print(f"mpost: {mpost}")
-
-    if debug:
-        print("mdict:", mdict)
+    logger.debug(f"mpost: {mpost}")
+    logger.debug(f"mdict: {mdict}")
     return (mdict, mmat, mmodels, mpost)
 
 
@@ -419,8 +420,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     mmat = {}
     mpost = {}
 
-    if args.debug:
-        print(f"setup: confdata={confdata}")
+    logger.debug(f"setup: confdata={confdata}")
     cad_basename = ""
     if "geom" in confdata:
         if args.debug:
@@ -468,14 +468,12 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
             args.debug or args.verbose,
             session,
         )
-    if args.debug:
-        print(f"setup: mpost[]={mpost}")
+    logger.debug(f"setup: mpost[]={mpost}")
 
     name = jsonfile
     if name in confdata:
         name = confdata["name"]
-        if args.debug:
-            print(f"name={name} from confdata")
+        logger.debug(f"name={name} from confdata")
 
     # create cfg
     jsonfile += "-" + args.method
@@ -536,8 +534,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         material_generic_def.append("conduct-nosource")  # only for transient with mqs
 
     if args.method == "cfpdes":
-        if args.debug:
-            print("cwd=", cwd)
+        logger.debug("cwd=", cwd)
         from shutil import copyfile
 
         for jfile in material_generic_def:
@@ -556,12 +553,14 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
 
         csvfiles = glob("./*.csv")
         print(f"csvfiles: {csvfiles}")
-        if args.debug:
-            print(f"pwd: {os.getcwd()}, ls: {os.listdir(os.curdir)}")
+        logger.debug(f"pwd: {os.getcwd()}, ls: {os.listdir(os.curdir)}")
 
     return (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles)  # , tarfilename)
 
-def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
+
+def commissioning_setup(
+    MyEnv, args, confdata, jsonfile: str, currents: dict, session=None
+):
     """
     generate sim files for commissiong
     """
@@ -578,7 +577,7 @@ def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, se
         os.chdir(args.wd)
     print(f"commissioning_setup/main: {os.getcwd()}")
 
-    if args.geom ==  "3D":
+    if args.geom == "3D":
         raise RuntimeError(f"commissioning_setup for 3D geometries not implemented yet")
 
     # call setup for several scenario corresponding to cooling
@@ -603,10 +602,20 @@ def commissioning_setup(MyEnv, args, confdata, jsonfile: str, currents: dict, se
                 setup_args.frictions = friction
                 setup_args.hcorrelation = heatcorrelation
                 setup_args.wd = f"{args.wd}/{cooling}/{friction}/{heatcorrelation}"
-                (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = setup(MyEnv, setup_args, confdata, jsonfile, currents, session)
-                commissioning_setup[setup_args.wd] = (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles)
+                (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = setup(
+                    MyEnv, setup_args, confdata, jsonfile, currents, session
+                )
+                commissioning_setup[setup_args.wd] = (
+                    yamlfile,
+                    cfgfile,
+                    jsonfile,
+                    xaofile,
+                    meshfile,
+                    csvfiles,
+                )
 
     return commissiong_data
+
 
 def setup_cmds(
     MyEnv,
@@ -748,12 +757,12 @@ def setup_cmds(
         cmds["Run"] = f"singularity exec {simage_path}/{feelpp} {feelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
     else:
-        cmds[
-            "Run"
-        ] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
-        cmds[
-            "Workflow"
-        ] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+        cmds["Run"] = (
+            f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {feelcmd}"
+        )
+        cmds["Workflow"] = (
+            f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+        )
 
     # compute resultdir:
     # with open(cfgfile, 'r') as f:
@@ -776,9 +785,9 @@ def setup_cmds(
             pyparaview = f'/usr/lib/python3/dist-packages/python_magnetsetup/postprocessing//pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend "{postdata[key]}" --resultdir {result_dir}'
             # pyparaview = f'pv-scalarfield.py --cfgfile {cfgfile}  --jsonfile {jsonfile} --expr {key} --exprlegend \"{postdata[key]}\" --resultdir {result_dir}'
             pyparaviewcmd = f"pvpython {pyparaview}"
-            cmds[
-                "Postprocessing"
-            ] = f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
+            cmds["Postprocessing"] = (
+                f"singularity exec {simage_path}/{paraview} {pyparaviewcmd}"
+            )
 
     # cmds["Save"] = f"pushd {result_dir}/.. && tar zcf {result_arch} np_{NP} && popd && mv {result_dir}/../{result_arch} ."
 
@@ -791,6 +800,7 @@ def setup_cmds(
 
     return cmds
 
+
 def commissioning_cmds(
     MyEnv,
     args,
@@ -798,7 +808,7 @@ def commissioning_cmds(
     commissioning_data: dict,
     root_directory: str,
     currents: dict,
-    ):
+):
     """
     create cmds for commissioning
     """
@@ -814,8 +824,7 @@ def commissioning_cmds(
     if node_spec.multithreading:
         NP = int(NP / 2)
         print(f"NP={NP} multithreading on")
-    if args.debug:
-        print(f"NP={NP} {type(NP)}")
+    logger.debug(f"NP={NP} {type(NP)}")
     if args.np > 0:
         if args.np > NP:
             print(
@@ -864,9 +873,23 @@ def commissioning_cmds(
         setup_args.frictions = friction
         setup_args.hcorrelation = heatcorrelation
         setup_args.wd = f"{args.wd}/{cooling}/{friction}/{heatcorrelation}"
-        (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = commissioning_data[key]
-        sub_cmds = setup_cmds(MyEnv, setup_args, node_spec, yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles, root_directory, currents)
-        print(f'{key}: sub_cmds={list(sub_cmds.keys())}')
+        (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) = commissioning_data[
+            key
+        ]
+        sub_cmds = setup_cmds(
+            MyEnv,
+            setup_args,
+            node_spec,
+            yamlfile,
+            cfgfile,
+            jsonfile,
+            xaofile,
+            meshfile,
+            csvfiles,
+            root_directory,
+            currents,
+        )
+        print(f"{key}: sub_cmds={list(sub_cmds.keys())}")
         # shall remove run and workflow from sub_cmds
 
     pyfeelcmd = f"python {pyfeel} {cfgfile} {pyfeel_args}"
@@ -874,9 +897,9 @@ def commissioning_cmds(
         pyfeelcmd = f"mpirun -np {NP} {pyfeelcmd}"
         cmds["Workflow"] = f"singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
     else:
-        cmds[
-            "Workflow"
-        ] = f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+        cmds["Workflow"] = (
+            f"mpirun -np {NP} singularity exec {simage_path}/{feelpp} {pyfeelcmd}"
+        )
 
     # to be fixed
     # result_dir = f"{root_directory}/feelppdb/np_{NP}"

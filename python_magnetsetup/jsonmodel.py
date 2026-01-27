@@ -8,6 +8,9 @@ import math
 
 from .utils import Merge
 from .units import load_units, convert_data
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def create_params_csvfiles_supra(
@@ -59,8 +62,7 @@ def create_params_supra(
     # eg. detail=None: Nturns total number of tapes, Area
     #     detail=dblpancake Nturns number of tapes per dblpancake, Area of a dblpancake
     #     and so on for detail=pancake and detail=tape (NB turns=1)
-    if debug:
-        print(params_data)
+    logger.debug("create_params_supra: %s", params_data)
 
     return params_data
 
@@ -193,10 +195,9 @@ def create_params_bitter(
     ) = gdata
     Zmin = min(Zh)
     Zmax = max(Zh)
-    if debug:
-        print("unit_Length", unit_Length)
-        print("Zmax:", Zmax)
-        print("Zmin:", Zmin)
+    logger.debug("unit_Length %s", unit_Length)
+    logger.debug("Zmax: %s", Zmax)
+    logger.debug("Zmin: %s", Zmin)
     if unit_Length == "meter":
         Zmin = convert_data(units, Zmin, "Length")
         Zmax = convert_data(units, Zmax, "Length")
@@ -279,8 +280,7 @@ def create_params_bitter(
             {"name": "mu0", "value": convert_data(units, 4 * math.pi * 1e-7, "mu0")}
         )
 
-    if debug:
-        print(params_data)
+    logger.debug("create_params_bitter: %s", params_data)
 
     return params_data
 
@@ -312,8 +312,7 @@ def create_params_insert(
         turns_h,
     ) = gdata
 
-    if debug:
-        print("unit_Length", unit_Length)
+    logger.debug("unit_Length %s", unit_Length)
     if unit_Length == "meter":
         R1 = convert_data(units, R1, "Length")
         R2 = convert_data(units, R2, "Length")
@@ -329,10 +328,9 @@ def create_params_insert(
         Zmax.append(max(Zh[i]))
 
     # chech dim
-    if debug:
-        print("corrected R1:", R1)
-        print("unit_Length", unit_Length)
-        print("R1:", R1, "R2:", R2, "Zmin:", Zmin, "Zmax:", Zmax)
+    logger.debug("corrected R1: %s", R1)
+    logger.debug("unit_Length %s", unit_Length)
+    logger.debug("R1: %s R2: %s Zmin: %s Zmax: %s", R1, R2, Zmin, Zmax)
 
     # Tini, Aini for transient cases??
     params_data = {"Parameters": []}
@@ -457,8 +455,7 @@ def create_params_insert(
     # TODO: CG: U_H%d%
     # TODO: HDG: U_H%d% if no ibc    # TODO: length data are written in mm should be in SI instead
 
-    if debug:
-        print(params_data)
+    logger.debug("create_params_bitter: %s", params_data)
 
     return params_data
 
@@ -471,8 +468,7 @@ def create_materials_supra(
     debug: bool = False,
 ) -> dict:
     materials_dict = {}
-    if debug:
-        print("create_material_supra:", confdata)
+    logger.debug("create_material_supra: %s", confdata)
 
     fconductor = templates["conductor"]
 
@@ -506,8 +502,7 @@ def create_materials_bitter(
     debug: bool = False,
 ) -> dict:
     materials_dict = {}
-    if debug:
-        print("create_material_bitter:", confdata)
+    logger.debug("create_material_bitter: %s", confdata)
 
     fconductor = templates["conductor"]
     finsulator = templates["insulator"]
@@ -539,8 +534,7 @@ def create_materials_bitter(
     ) = gdata
 
     if method_data[2] == "Axi":
-        if debug:
-            print("create_material_bitter: Conductor_", name)
+        logger.debug("create_material_bitter: Conductor_ %s", name)
         mdata = entry(
             fconductor,
             Merge(
@@ -559,8 +553,7 @@ def create_materials_bitter(
         )
 
         if bitter_insulator:
-            if debug:
-                print("create_material_bitter: Insulator_", name)
+            logger.debug("create_material_bitter: Insulator_ %s", name)
             mdata = entry(
                 finsulator,
                 Merge(
@@ -579,8 +572,7 @@ def create_materials_bitter(
     else:
         return {}
 
-    if debug:
-        print(materials_dict)
+    logger.debug("create_material_bitter: %s", materials_dict)
     return materials_dict
 
 
@@ -595,8 +587,7 @@ def create_materials_insert(
 ) -> dict:
     # TODO loop for Plateau (Axi specific)
     materials_dict = {}
-    if debug:
-        print("create_material_insert:", confdata)
+    logger.debug("create_material_insert: %s", confdata)
 
     fconductor = templates["conductor"]
     finsulator = templates["insulator"]
@@ -752,8 +743,7 @@ def create_models_supra(
     debug: bool = False,
 ) -> dict:
     models_dict = {}
-    if debug:
-        print("create_models_supra:", confdata)
+    logger.debug("create_models_supra: %s", confdata)
 
     fconductor = templates[equation + "-conductor"]
 
@@ -788,8 +778,7 @@ def create_models_bitter(
     debug: bool = False,
 ) -> dict:
     models_dict = {}
-    if debug:
-        print("create_model_bitter:", confdata)
+    logger.debug("create_model_bitter: %s", confdata)
 
     fconductor = templates[equation + "-conductor"]
     finsulator = templates[equation + "-insulator"]
@@ -833,8 +822,7 @@ def create_models_bitter(
     else:
         return {}
 
-    if debug:
-        print(models_dict)
+    logger.debug("create_model_bitter: %s", models_dict)
     return models_dict
 
 
@@ -850,8 +838,7 @@ def create_models_insert(
     # TODO loop for Plateau (Axi specific)
     models_dict = {}
     # "physic":equation }
-    if debug:
-        print("create_models_insert:", confdata)
+    logger.debug("create_models_insert: %s", confdata)
 
     fconductor = templates[equation + "-conductor"]
     finsulator = templates[equation + "-insulator"]
@@ -1158,13 +1145,11 @@ def create_json(
     Create a json model file
     """
 
-    if debug:
-        print("create_json jsonfile=", jsonfile)
-        print("create_json mdict=", mdict)
+    logger.debug("create_json jsonfile= %s", jsonfile)
+    logger.debug("create_json mdict= %s", mdict)
 
     data = entry(templates["model"], mdict, debug)
-    if debug:
-        print(f"create_json/data model: {data}")
+    logger.debug("create_json/data model: %s", data)
 
     # material section
     if "Materials" in data:
@@ -1172,12 +1157,10 @@ def create_json(
             data["Materials"][key] = mmat[key]
     else:
         data["Materials"] = mmat
-    if debug:
-        print("create_json/Materials data:", data)
+    logger.debug("create_json/Materials data: %s", data)
 
     # models section from templates['physic']
-    if debug:
-        print(f"mmodels: {mmodels}")
+    logger.debug("mmodels: %s", mmodels)
     for physic in templates["physic"]:
         _model = mmodels[physic]
         for key in _model:
@@ -1188,16 +1171,14 @@ def create_json(
     # init_heat['init_Temperature'] = mpost['init']
 
     # postprocess
-    if debug:
-        for field in templates["stats"]:
-            print(f"stats: {field}")
+    for field in templates["stats"]:
+        logger.debug("stats: %s", field)
 
     post_keywords = {}
 
-    if debug:
-        print("templates[stats]")
-        for field in templates["stats"]:
-            print(field)
+    logger.debug("templates[stats]")
+    for field in templates["stats"]:
+        logger.debug("stats field: %s", field)
 
     for field in templates["stats"]:
         _data = templates["stats"][field]
@@ -1209,22 +1190,20 @@ def create_json(
             "data": {_name: mpost[field] if field in mpost else {}},
         }
 
-    if debug:
-        print(f"method_data[3]: {method_data[3]}")
-        print(f"post_keywords: {post_keywords.keys()}")
+    logger.debug("method_data[3]: %s", method_data[3])
+    logger.debug("post_keywords: %s", post_keywords.keys())
     if "th" in method_data[3] and "Stats_Flux" in post_keywords:
         templatefile = templates["flux"]
         post_keywords["Stats_Flux"]["template"] = templatefile
-        if debug:
-            print(f"cooling={method_data[4]}")
-            print(f"templates keywords: {templates.keys()}")
-            print(f"templates[flux]: {templatefile}")
-            print(
-                f'post_keywords[Stats_Flux][template]={post_keywords["Stats_Flux"]["template"]}'
-            )
+        logger.debug("cooling=%s", method_data[4])
+        logger.debug("templates keywords: %s", templates.keys())
+        logger.debug("templates[flux]: %s", templatefile)
+        logger.debug(
+            "post_keywords[Stats_Flux][template]=%s",
+            post_keywords["Stats_Flux"]["template"],
+        )
 
-    if debug:
-        print("post_keywords")
+        logger.debug("post_keywords")
         for key in post_keywords:
             msg = key
             field = post_keywords[key]
@@ -1236,18 +1215,16 @@ def create_json(
         field = post_keywords[key]
         if field["physic"] in data["PostProcess"]:
             _data = field["data"]
-            if debug:
-                print(f"{key}: field={field}")
-                if key == "Stats_Flux":
-                    print(f"{key} (type={type(_data)}): {_data}")
-                print(f"{key} (type={type(_data)}): {_data}")
+            logger.debug(f"{key}: field={field}")
+            if key == "Stats_Flux":
+                logger.debug(f"{key} (type={type(_data)}): {_data}")
+            logger.debug(f"{key} (type={type(_data)}): {_data}")
             add = data["PostProcess"][field["physic"]]["Measures"]["Statistics"]
             # print(f"{key}: add={add}")
             odata = entry(field["template"], _data, debug)
-            if debug:
-                print(f"{key}: odata={odata}")
-                if field == "Stats_Flux":
-                    print(f"{key}: odata={odata}")
+            logger.debug("%s: odata=%s", key, odata)
+            if field == "Stats_Flux":
+                logger.debug("%s: odata=%s", key, odata)
             for md in odata[key]:
                 # print(f'{key}: add[{md}], odata[{key}][{md}]={odata[key][md]}')
                 add[md] = odata[key][md]
@@ -1256,11 +1233,10 @@ def create_json(
     # TODO: add data for B plots, aka Rinf, Zinf, NR and Nz?
     if "B" in mpost:
         plotB_data = mpost["B"]
-        if debug:
-            print("plotB")
-            print("section:", "magnetic")
-            print("templates[plots]:", templates["plots"])
-            print(f"plotB_data:{plotB_data}")
+        logger.debug("plotB")
+        logger.debug("section: magnetic")
+        logger.debug("templates[plots]: %s", templates["plots"])
+        logger.debug(f"plotB_data:{plotB_data}")
         add = data["PostProcess"]["magnetic"]["Measures"]["Points"]
         odata = entry(
             templates["plots"]["B"],
@@ -1273,11 +1249,9 @@ def create_json(
             debug,
         )
         # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
-        if debug:
-            print(f"plot_B odata: {odata}")
+        logger.debug("plot_B odata: %s", odata)
         for md in odata:
-            if debug:
-                print(f"odata[{md}]: {odata[md]}")
+            logger.debug("odata[%s]: %s", md, odata[md])
             add[md] = odata[md]
         # print(f"data[PostProcess][magnetic][Measures][Points]: {add}")
 
@@ -1292,9 +1266,8 @@ def entry(template: str, rdata: list, debug: bool = False) -> str:
     import chevron
     import re
 
-    if debug:
-        print("entry/loading {str(template)}", type(template))
-        print("entry/rdata:", rdata)
+    logger.debug("entry/loading %s", str(template))
+    logger.debug("entry/rdata: %s", rdata)
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("'", '"')
@@ -1306,9 +1279,8 @@ def entry(template: str, rdata: list, debug: bool = False) -> str:
     corrected = corrected.replace("&quot;", '"')
     corrected = corrected.replace("&lt;", "<")
     corrected = corrected.replace("&gt;", ">")
-    if debug:
-        print(f"entry/jsonfile: {jsonfile}")
-        print(f"corrected: {corrected}")
+    logger.debug("entry/jsonfile: %s", jsonfile)
+    logger.debug("corrected: %s", corrected)
 
     try:
         mdata = json.loads(corrected)
@@ -1317,7 +1289,6 @@ def entry(template: str, rdata: list, debug: bool = False) -> str:
         # save corrected to tmp file and run jsonlint-php tmp??
         raise Exception(f"entry: json.decoder.JSONDecodeError in {corrected}")
 
-    if debug:
-        print("entry/data (json):\n", mdata)
+    logger.debug("entry/data (json):\n%s", mdata)
 
     return mdata

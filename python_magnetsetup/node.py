@@ -4,6 +4,9 @@ import enum
 from dataclasses import dataclass, field
 
 from .job import JobManager, JobManagerType
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class NodeType(str, enum.Enum):
@@ -27,22 +30,18 @@ def load_machines(debug: bool = False):
     """
     load machines definition as a dict
     """
-    print("load machines", flush=True)
-    if debug:
-        print("load_machines")
+    logger.debug("load machines")
+    logger.debug("load_machines")
 
     default_path = os.path.dirname(os.path.abspath(__file__))
     with open(os.path.join(default_path, "machines.json"), "r") as cfg:
-        if debug:
-            print(f"load_machines from: {cfg.name}")
+        logger.debug("load_machines from: %s", cfg.name)
         data = json.load(cfg)
-        if debug:
-            print(f"data={data}")
+        logger.debug("data=%s", data)
 
     machines = {}
     for item, value in data.items():
-        if debug:
-            print(f"server: {item} type={value['type']}")
+        logger.debug("server: %s type=%s", item, value["type"])
         server = NodeSpec(
             name=item,
             otype=NodeType[value["type"]],

@@ -1,16 +1,29 @@
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
+
 
 def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
     import chevron
 
-    if debug:
-        print("entry/loading %s" % str(template), type(template))
-        print("entry/rdata:", rdata)
+    logger.debug("entry/loading %s" % str(template))
+    logger.debug("entry/rdata:", rdata)
     with open(template, "r") as f:
         jsonfile = chevron.render(f, rdata)
-    jsonfile = jsonfile.replace("\'", "\"")
+    jsonfile = jsonfile.replace("'", '"')
     return jsonfile
 
-def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str, template: str, method_data: list[str], debug: bool=False):
+
+def create_cfg(
+    cfgfile: str,
+    name: str,
+    mesh: str,
+    nonlinear: bool,
+    jsonfile: str,
+    template: str,
+    method_data: list[str],
+    debug: bool = False,
+):
     """
     Create a cfg file
     """
@@ -36,15 +49,13 @@ def create_cfg(cfgfile:str, name: str, mesh: str, nonlinear: bool, jsonfile: str
         "jsonfile": jsonfile,
         "mesh": mesh,
         "scale": 0.001,
-        "partition": 1
+        "partition": 1,
     }
-    
+
     mdata = entry_cfg(template, data, debug)
-    if debug:
-        print(f"create_cfg/mdata={mdata}")
+    logger.debug(f"create_cfg/mdata={mdata}")
 
     with open(cfgfile, "w+") as out:
         out.write(mdata)
-    
-    pass
 
+    pass

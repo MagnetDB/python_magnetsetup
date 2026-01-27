@@ -2,6 +2,9 @@ import json
 import os
 
 from decouple import Config, RepositoryEnv
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class appenv:
@@ -30,8 +33,7 @@ class appenv:
         if envfile is not None:
             envdata = RepositoryEnv(envfile)
             data = Config(envdata)
-            if debug:
-                print("appenv:", RepositoryEnv("settings.env").data)
+            logger.debug(f"appenv: {RepositoryEnv('settings.env').data}")
 
             self.url_api = data.get("URL_API")
             self.compute_server = data.get("COMPUTE_SERVER")
@@ -46,8 +48,7 @@ class appenv:
                 self.mesh_repo = data.get("DATA_REPO") + "/meshes"
                 self.mrecord_repo = data.get("DATA_REPO") + "/mrecords"
                 self.optim_repo = data.get("DATA_REPO") + "/optims"
-        if debug:
-            print(f"DATA: {self.yaml_repo}")
+        logger.debug(f"DATA: {self.yaml_repo}")
 
     def template_path(self, debug: bool = False):
         """
@@ -59,8 +60,7 @@ class appenv:
         else:
             repo = self.template_repo
 
-        if debug:
-            print("appenv/template_path:", repo)
+        logger.debug(f"appenv/template_path: {repo}")
         return repo
 
     def simage_path(self, debug: bool = False):
@@ -72,8 +72,7 @@ class appenv:
         else:
             repo = self.simage_repo
 
-        if debug:
-            print("appenv/simage_path:", repo)
+        logger.debug(f"appenv/simage_path: {repo}")
         return repo
 
 
@@ -120,8 +119,7 @@ def loadtemplates(
     insulator_model = modelcfg["insulator"]
 
     fcfg = os.path.join(template_path, cfg_model)
-    if debug:
-        print(f"fcfg: {fcfg} type={type(fcfg)}")
+    logger.debug(f"fcfg: {fcfg} type={type(fcfg)}")
 
     fmodel = os.path.join(template_path, json_model)
     fconductor = os.path.join(template_path, conductor_model)
@@ -150,15 +148,13 @@ def loadtemplates(
             dict["stats"][field]["template"] = os.path.join(
                 template_path, _cfg[field]["template"]
             )
-        if debug:
-            print(f"dict[stats]={dict['stats']}")
+        logger.debug("dict[stats]=%s", dict["stats"])
 
     if "plots" in modelcfg:
         _cfg = modelcfg["plots"]
         for field in _cfg:
             dict["plots"][field] = os.path.join(template_path, _cfg[field])
-        if debug:
-            print(f"dict[plots]={dict['plots']}")
+        logger.debug("dict[plots]=%s", dict["plots"])
 
     for kdata in modelcfg["models"]:
         dict[kdata] = os.path.join(template_path, modelcfg["models"][kdata])

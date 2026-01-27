@@ -15,6 +15,10 @@ from .utils import NMerge
 
 from .file_utils import MyOpen, findfile, search_paths
 
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
+
 
 def Supra_simfile(MyEnv, confdata: dict, cad: Supra, debug: bool = False):
     print(f"Supra_simfile: cad={cad.name}")
@@ -75,6 +79,7 @@ def Supra_setup(
         snames = insert.get_names(name, cad.detail, verbose=debug)
         part_thermic = snames
 
+        part_electric = []
         if cad.detail == "dblpancake":
             search_pattern = f"{name}_{cad.name}_dp_\\d"
             part_eletric = [
@@ -95,9 +100,8 @@ def Supra_setup(
             )
     print(f"supra: part_electric={part_electric}")
 
-    if debug:
-        print("supra part_thermic:", part_thermic)
-        print("supra part_electric:", part_electric)
+    logger.debug("supra part_thermic:", part_thermic)
+    logger.debug("supra part_electric:", part_electric)
 
     if method_data[2] == "Axi" and (
         "el" in method_data[3] and method_data[3] != "thelec"
@@ -154,9 +158,7 @@ def Supra_setup(
 
     # add T per magnet data: mdict = NMerge( mdict, {'T_magnet': T_data}, debug, "bitter_setup mdict")
     T_data = []
-    T_data.append(
-        {"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)}
-    )
+    T_data.append({"name": f"{mname}", "magnet_parts": copy.deepcopy(part_thermic)})
     T_dict = {"T_magnet": T_data}
     NMerge(T_dict, mdict, debug, "insert_setup mdict")
 

@@ -15,6 +15,9 @@ from .utils import Merge, NMerge
 import os
 
 from .file_utils import MyOpen, findfile, search_paths
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter, debug: bool = False):
@@ -38,8 +41,7 @@ def Bitter_setup(
     debug: bool = False,
 ):
     print(f"Bitter_setup: magnet={mname}, cad={cad.name}")
-    if debug:
-        print(f"Bitter_setup/Bitter confdata: {confdata}")
+    logger.debug(f"Bitter_setup/Bitter confdata: {confdata}")
 
     prefix = ""
     if mname:
@@ -64,13 +66,10 @@ def Bitter_setup(
     boundary_electric = []
 
     yamlfile = confdata["geom"]
-    if debug:
-        print(f"Bitter_setup/Bitter yamlfile: {yamlfile}")
+    logger.debug(f"Bitter_setup/Bitter yamlfile: {yamlfile}")
 
     NSections = len(cad.modelaxi.turns)
-    if debug:
-        print(f"cad: {cad} tpe: {type(cad)}")
-
+    logger.debug(f"cad: {cad} tpe: {type(cad)}")
     ignore_index = []
     snames = []
     name = f"{prefix}{cad.name}"  # .replace('Bitter_','')
@@ -97,16 +96,14 @@ def Bitter_setup(
         part_conductors.append(f"Conductor_{name}")
         if list(set(part_thermic) - set(part_electric)):
             part_insulators.append(f"Insulator_{name}")
-        if debug:
-            print("sname:", snames)
+        logger.debug("sname: %s", snames)
     else:
         part_electric.append(cad.name)
         if "th" in method_data[3]:
             part_thermic.append(cad.name)
 
-    if debug:
-        print("bitter part_thermic:", part_thermic)
-        print("bitter part_electric:", part_electric)
+    logger.debug("bitter part_thermic: %s", part_thermic)
+    logger.debug("bitter part_electric: %s", part_electric)
 
     if method_data[2] == "Axi" and (
         "el" in method_data[3] and method_data[3] != "thelec"
