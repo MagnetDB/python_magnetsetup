@@ -1,4 +1,3 @@
-
 import yaml
 import copy
 
@@ -14,6 +13,10 @@ from .jsonmodel import (
 )
 from .utils import Merge, NMerge
 from .file_utils import MyOpen, findfile, search_paths
+
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 import os
 
@@ -79,7 +82,7 @@ def Insert_simfile(
     for ring in cad.rings:
         with MyOpen(ring.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
             files.append(f.name)
-        
+
         xaofile = ring.name + ".xao"
         f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
         files.append(f)
@@ -90,9 +93,11 @@ def Insert_simfile(
 
     if cad.currentleads:
         for lead in cad.currentleads:
-            with MyOpen(lead.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")) as f:
+            with MyOpen(
+                lead.name + ".yaml", "r", paths=search_paths(MyEnv, "geom")
+            ) as f:
                 files.append(f.name)
-            
+
             xaofile = lead.name + ".xao"
             f = findfile(xaofile, paths=search_paths(MyEnv, "cad"))
             files.append(f)
@@ -149,7 +154,7 @@ def Insert_setup(
     if mname:
         prefix = f"{mname}_"
 
-    for i,helix in enumerate(cad.helices):
+    for i, helix in enumerate(cad.helices):
         part_helix = []
         pitch_h.append(helix.modelaxi.pitch)
         turns_h.append(helix.modelaxi.turns)
@@ -183,9 +188,7 @@ def Insert_setup(
         part_electric = part_electric + flatten(part_mat_conductors)
         if "th" in method_data[3]:
             part_thermic = (
-                part_thermic
-                + part_electric
-                + list(flatten(part_mat_insulators))
+                part_thermic + part_electric + list(flatten(part_mat_insulators))
             )
 
     for i in range(NRings):
@@ -241,13 +244,12 @@ def Insert_setup(
             else:
                 boundary_meca.append(f"{prefix}R{i}_HP")
 
-    if debug:
-        print("insert part_electric:", part_electric)
-        print("insert part_thermic:", part_thermic)
-        print("insert part_insulators:", part_insulators)
-        print("insert part_mat_insulators:", part_mat_insulators)
-        print("insert part_conductors:", part_conductors)
-        print("insert part_mat_conductors:", part_mat_conductors)
+        logger.debug("insert part_electric: %s", part_electric)
+        logger.debug("insert part_thermic: %s", part_thermic)
+        logger.debug("insert part_insulators: %s", part_insulators)
+        logger.debug("insert part_mat_insulators: %s", part_mat_insulators)
+        logger.debug("insert part_conductors: %s", part_conductors)
+        logger.debug("insert part_mat_conductors: %s", part_mat_conductors)
 
     # params section
     ngdata = (NHelices, NRings, NChannels, Nsections, R1, R2, Dh, Sh, Zh, turns_h)

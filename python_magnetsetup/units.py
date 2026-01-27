@@ -17,6 +17,9 @@ from .objects import load_object
 import yaml
 
 from python_magnetgeo.Insert import Insert
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 # Ignore warning for pint
 with warnings.catch_warnings():
@@ -90,8 +93,7 @@ def convert_data(
     data = None
     if isinstance(quantity, float) or isinstance(quantity, int):
         data = Quantity(quantity, units[qtype][0]).to(units[qtype][1]).magnitude
-        if debug:
-            print(qtype, quantity, "data=", data)
+        logger.debug(f"{qtype} {quantity} data= {data}")
     elif isinstance(quantity, list):
         data = (
             Quantity(quantity, units[qtype][0]).to(units[qtype][1]).magnitude.tolist()

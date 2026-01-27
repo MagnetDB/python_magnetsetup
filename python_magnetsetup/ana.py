@@ -7,7 +7,8 @@ import yaml
 import math
 
 import argparse
-#from .objects import load_object, load_object_from_db
+
+# from .objects import load_object, load_object_from_db
 from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
@@ -18,19 +19,23 @@ from python_magnetgeo.Supra import Supra
 from python_magnetgeo.SupraStructure import HTSInsert
 
 from .file_utils import MyOpen, findfile, search_paths
+from .logging_config import get_logger
+
+logger = get_logger(__name__)
 
 import magnettools.magnettools as mt
 
-def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
+
+def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
     """
     create view of this insert as a Helices Magnet
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
-    if debug: print("HMagnet:", data)
+    logger.debug("HMagnet: %s", data)
 
     # how to create Tubes??
-    #Tube(const int n= len(struct.modelaxi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.modelaxi.h??)
+    # Tube(const int n= len(struct.modelaxi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.modelaxi.h??)
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -40,35 +45,37 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool=False):
     for helix in data["Helix"]:
         material = helix["material"]
         geom = helix["geom"]
-        with MyOpen(geom, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+        with MyOpen(geom, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
+            cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
         nturns = len(cad.modelaxi.turns)
-        if debug:
-            print("nturns:", nturns)
+        logger.debug("nturns: %s", nturns)
         r1 = cad.r[0]
         r2 = cad.r[1]
         h = cad.modelaxi.h
-        Tube = mt.Tube(nturns, r1*1.e-3, r2*1.e-3, h*1.e-3)
+        Tube = mt.Tube(nturns, r1 * 1.0e-3, r2 * 1.0e-3, h * 1.0e-3)
         Tube.set_index(index)
-        if debug:
-            print("index:", index, Tube.get_index())
-            print("cad.modelaxi:", cad.modelaxi)
-        for (n, pitch) in zip(cad.modelaxi.turns,cad.modelaxi.pitch):
-            Tube.set_pitch(pitch*1.e-3)
+        logger.debug("index: %s %s", index, Tube.get_index())
+        logger.debug("cad.modelaxi: %s", cad.modelaxi)
+        for n, pitch in zip(cad.modelaxi.turns, cad.modelaxi.pitch):
+            Tube.set_pitch(pitch * 1.0e-3)
             Tube.set_nturn(n)
 
-        Tubes.append( Tube )
+        Tubes.append(Tube)
         fillingfactor = 1
         tmp = BMagnet(cad, material, fillingfactor, debug)
         for item in tmp:
             Helices.append(item)
         index += Tube.get_n_elem()
 
-    if debug:
-        print("HMagnet:", struct.name, "Tubes:", len(Tubes), "Helices:", len(Helices))
+    logger.debug(
+        "HMagnet: %s Tubes: %d Helices: %d", struct.name, len(Tubes), len(Helices)
+    )
     return (Tubes, Helices, OHelices)
 
-def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=False):
+
+def BMagnet(
+    struct: Bitter, material: dict, fillingfactor: float = 1, debug: bool = False
+):
     """
     create view of this insert as a Bitter Magnet
 
@@ -78,33 +85,33 @@ def BMagnet(struct: Bitter, material: dict, fillingfactor: float=1, debug: bool=
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, 1/float(n), rho)
     """
-    
-    BMagnets = mt.VectorOfBitters()
-    
-    rho = 1/ material["ElectricalConductivity"]
-    # f = fillingfactor # 1/struct.get_Nturns() # struct.getFillingFactor()
-        
-    r1 = struct.r[0]*1.e-3
-    r2 = struct.r[1]*1.e-3
-    z = -struct.modelaxi.h*1.e-3
 
-    for (n, pitch) in zip(struct.modelaxi.turns, struct.modelaxi.pitch):
-        dz = n * pitch*1.e-3
-        f = 1/float(n) # struct.getFillingFactor()
+    BMagnets = mt.VectorOfBitters()
+
+    rho = 1 / material["ElectricalConductivity"]
+    # f = fillingfactor # 1/struct.get_Nturns() # struct.getFillingFactor()
+
+    r1 = struct.r[0] * 1.0e-3
+    r2 = struct.r[1] * 1.0e-3
+    z = -struct.modelaxi.h * 1.0e-3
+
+    for n, pitch in zip(struct.modelaxi.turns, struct.modelaxi.pitch):
+        dz = n * pitch * 1.0e-3
+        f = 1 / float(n)  # struct.getFillingFactor()
         if f != 1:
-            j = n / (r1 * math.log(r2/r1) * dz)
+            j = n / (r1 * math.log(r2 / r1) * dz)
         else:
-            j = 1 / (r1 * math.log(r2/r1) * dz)
-        z_offset = z + dz/2.
-        BMagnets.append( mt.BitterMagnet(r2, r1, dz, j, z_offset, f, rho) )
-                
+            j = 1 / (r1 * math.log(r2 / r1) * dz)
+        z_offset = z + dz / 2.0
+        BMagnets.append(mt.BitterMagnet(r2, r1, dz, j, z_offset, f, rho))
+
         z += dz
 
-    if debug:
-        print("BMagnet:", struct.name, len(BMagnets))
+    logger.debug("BMagnet: %s %d", struct.name, len(BMagnets))
     return BMagnets
 
-def UMagnet(struct: Supra, debug: bool=False):
+
+def UMagnet(struct: Supra, debug: bool = False):
     """
     create view of this insert as a Uniform Magnet
 
@@ -117,14 +124,15 @@ def UMagnet(struct: Supra, debug: bool=False):
     S = 0
     for dp in struct.dblepancakes:
         nturns += 2 * dp.pancake.n
-        j = nturns / struct.getArea()*1.e-6
-    
-    if debug:
-        print("UMagnets:", struct.name, 1)
-    return mt.UnifMagnet(struct.r1*1.e-3, struct.r0*1.e-3, struct.h*1.e-3, j, struct.z0, f, rho)
+        j = nturns / struct.getArea() * 1.0e-6
+
+    logger.debug("UMagnets: %s %d", struct.name, 1)
+    return mt.UnifMagnet(
+        struct.r1 * 1.0e-3, struct.r0 * 1.0e-3, struct.h * 1.0e-3, j, struct.z0, f, rho
+    )
 
 
-def UMagnets(struct: HTSInsert, detail: str ="dblepancake", debug: bool=False):
+def UMagnets(struct: HTSInsert, detail: str = "dblepancake", debug: bool = False):
     """
     create view of this insert as a stack of Uniform Magnets
 
@@ -139,27 +147,31 @@ def UMagnets(struct: HTSInsert, detail: str ="dblepancake", debug: bool=False):
     for dp in struct.dblepancakes:
         h = dp.getH()
         zm = dp.getZ0()
-        zi = zm - h/2.
+        zi = zm - h / 2.0
         if detail == "dblepancake":
             f = dp.getFillingFactor()
             S = dp.getArea()
             j = 2 * dp.pancake.n / S
-            UMagnets.append( mt.UnifMagnet(struct.r1, struct.r0, h, j, zm, f, rho) )
+            UMagnets.append(mt.UnifMagnet(struct.r1, struct.r0, h, j, zm, f, rho))
 
         elif detail == "pancake":
             h_p = dp.pancake.getH()
             f = dp.pancake.getFillingFactor()
             S = dp.pancake.getArea()
             j = dp.pancake.n / S
-            UMagnets.append( mt.UnifMagnet(struct.r1, struct.r0, h_p, j, zi+h_p/2., f, rho))
-            zi = (zm + h/2.) - h_p
-            UMagnets.append( mt.UnifMagnet(struct.r1, struct.r0, h_p, j, zi+h_p/2., f, rho))
+            UMagnets.append(
+                mt.UnifMagnet(struct.r1, struct.r0, h_p, j, zi + h_p / 2.0, f, rho)
+            )
+            zi = (zm + h / 2.0) - h_p
+            UMagnets.append(
+                mt.UnifMagnet(struct.r1, struct.r0, h_p, j, zi + h_p / 2.0, f, rho)
+            )
 
         elif detail == "tape":
             h_p = dp.pancake.getH()
             f = dp.pancake.tape.getFillingFactor()
             S = dp.pancake.tape.getArea()
-            j =  1 / S / f
+            j = 1 / S / f
             ntapes = dp.pancake.n
             h_t = dp.pancake.tape.h
             w = dp.pancake.tape.w
@@ -167,28 +179,26 @@ def UMagnets(struct: HTSInsert, detail: str ="dblepancake", debug: bool=False):
             for l in range(ntapes):
                 ri = r[l]
                 ro = ri + w
-                UMagnets.append( mt.UnifMagnet(ro, ri, h_t, j, zi+h_t/2., f, rho))
+                UMagnets.append(mt.UnifMagnet(ro, ri, h_t, j, zi + h_t / 2.0, f, rho))
 
-            zi = (zm + h/2.) - h_p
+            zi = (zm + h / 2.0) - h_p
             for l in range(ntapes):
                 ri = r[l]
                 ro = ri + w
-                UMagnets.append( mt.UnifMagnet(ro, ri, h_t, j, zi+h_t/2., f, rho))
+                UMagnets.append(mt.UnifMagnet(ro, ri, h_t, j, zi + h_t / 2.0, f, rho))
 
-    if debug:
-        print("UMagnets:", struct.name, len(UMagnets))
+    logger.debug("UMagnets: %s %d", struct.name, len(UMagnets))
     return UMagnets
 
 
-def magnet_setup(MyEnv, confdata: str, debug: bool=False):
+def magnet_setup(MyEnv, confdata: str, debug: bool = False):
     """
     Creating MagnetTools data struct for setup for magnet
     """
     print("magnet_setup", "debug=", debug)
-    
+
     yamlfile = confdata["geom"]
-    if debug:
-        print("magnet_setup:", yamlfile)
+    logger.debug("magnet_setup: %s", yamlfile)
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -196,14 +206,14 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     UMagnets = mt.VectorOfUnifs()
     BMagnets = mt.VectorOfBitters()
     Shims = mt.VectorOfShims()
-    
+
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
         cad = None
         # with open(yamlfile, 'r') as cfgdata:
-        with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+        with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
+            cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
         # if isinstance(cad, Insert):
         tmp = HMagnet(MyEnv, cad, confdata, debug)
         for item in tmp[0]:
@@ -221,17 +231,19 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
             for obj in confdata[mtype]:
                 print("obj:", obj)
                 cad = None
-                with MyOpen(obj['geom'], 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
-                    cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
-    
+                with MyOpen(
+                    obj["geom"], "r", paths=search_paths(MyEnv, "geom")
+                ) as cfgdata:
+                    cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
+
                 if isinstance(cad, Bitter):
-                    fillingfactor = 1/cad.modelaxi.get_Nturns()
+                    fillingfactor = 1 / cad.modelaxi.get_Nturns()
                     tmp = BMagnet(cad, obj["material"], fillingfactor, debug)
                     for item in tmp:
                         BMagnets.append(item)
                 elif isinstance(cad, Supra):
                     # get HTSinsert from cad
-                    if cad.detail == None:
+                    if cad.detail is None:
                         tmp = UMagnet(cad, debug)
                         UMagnets.append(tmp)
                     else:
@@ -251,18 +263,17 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
         Ustacks = mt.create_Ustack(UMagnets)
         print("UStacks:", len(Ustacks))
     # print("\n")
-    
-    return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
+
+    return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
 
 
-def msite_setup(MyEnv, confdata: str, debug: bool=False):
+def msite_setup(MyEnv, confdata: str, debug: bool = False):
     """
     Creating MagnetTools data struct for setup for msite
     """
-    if debug:
-        print(f"msite_setup: confdata={confdata}")
-        print(f"msite_setup: confdata[magnets]={confdata['magnets']}")
-    
+    logger.debug(f"msite_setup: confdata={confdata}")
+    logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
+
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
     OHelices = mt.VectorOfBitters()
@@ -271,11 +282,12 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
     Shims = mt.VectorOfShims()
 
     for magnet in confdata["magnets"]:
-        if debug:
-            print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
-            print(f"mconfdata[geom]: {magnet['geom']}")
+        logger.debug(
+            f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}"
+        )
+        logger.debug(f"mconfdata[geom]: {magnet['geom']}")
         tmp = magnet_setup(MyEnv, magnet, debug)
-        
+
         # pack magnets
         for item in tmp[0]:
             Tubes.append(item)
@@ -299,18 +311,17 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
         Ustacks = mt.create_Ustack(UMagnets)
         print("\nUStacks:", len(Ustacks))
     print("\n")
-    
-    return (Tubes,Helices,OHelices,BMagnets,UMagnets,Shims)
-    
+
+    return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
+
 
 def setup(MyEnv, args, confdata, jsonfile, session=None):
-    """
-    """
+    """ """
     print("ana/main")
-    default_pathes={
-        "geom" : MyEnv.yaml_repo,
-        "cad" : MyEnv.cad_repo,
-        "mesh" : MyEnv.mesh_repo
+    default_pathes = {
+        "geom": MyEnv.yaml_repo,
+        "cad": MyEnv.cad_repo,
+        "mesh": MyEnv.mesh_repo,
     }
 
     # loadconfig
@@ -334,26 +345,35 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
             with open(f"{confdata['name']}.yaml", "x") as out:
                 out.write("!<MSite>\n")
                 yaml.dump(confdata, out)
-        return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)               
+        return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)
 
     return 1
-     
+
+
 def main():
     # Manage Options
     command_line = None
-    parser = argparse.ArgumentParser(description="Create template json model files for Feelpp/HiFiMagnet simu")
-    parser.add_argument("--datafile", help="input data file (ex. HL-34-data.json)", default=None)
+    parser = argparse.ArgumentParser(
+        description="Create template json model files for Feelpp/HiFiMagnet simu"
+    )
+    parser.add_argument(
+        "--datafile", help="input data file (ex. HL-34-data.json)", default=None
+    )
     parser.add_argument("--wd", help="set a working directory", type=str, default="")
-    parser.add_argument("--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None)
-    parser.add_argument("--msite", help="MSite name from magnetdb (ex. HL-34)", default=None)
+    parser.add_argument(
+        "--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None
+    )
+    parser.add_argument(
+        "--msite", help="MSite name from magnetdb (ex. HL-34)", default=None
+    )
 
-    parser.add_argument("--debug", help="activate debug", action='store_true')
-    parser.add_argument("--verbose", help="activate verbose", action='store_true')
+    parser.add_argument("--debug", help="activate debug", action="store_true")
+    parser.add_argument("--verbose", help="activate verbose", action="store_true")
     args = parser.parse_args()
 
     if args.debug:
         print(f"Arguments: {str(args._)}")
-    
+
     # make datafile/[magnet|msite] exclusive one or the other
     if args.magnet != None and args.msite:
         raise Exception("cannot specify both magnet and msite")
@@ -363,23 +383,23 @@ def main():
 
     # load appenv
     MyEnv = appenv()
-    if args.debug: print(MyEnv.template_path())
+    if args.debug:
+        print(MyEnv.template_path())
 
     # Get Object
     if args.datafile != None:
         confdata = load_object(MyEnv, args.datafile, args.debug)
-        jsonfile = args.datafile.replace("-data.json","")
+        jsonfile = args.datafile.replace("-data.json", "")
 
     # if args.magnet != None:
     #     confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
     #     jsonfile = args.magnet
-    
+
     # if args.msite != None:
     #     confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
     #     jsonfile = args.msite
 
-
-    setup(MyEnv, args, confdata, jsonfile)    
+    setup(MyEnv, args, confdata, jsonfile)
     return 0
 
 
