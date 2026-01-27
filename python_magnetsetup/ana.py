@@ -11,6 +11,7 @@ import argparse
 from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
+from python_magnetgeo.utils import getObject
 from python_magnetgeo.Insert import Insert
 from python_magnetgeo.MSite import MSite
 from python_magnetgeo.Bitter import Bitter
@@ -184,11 +185,12 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
     """
     Creating MagnetTools data struct for setup for magnet
     """
-    print("magnet_setup", "debug=", debug)
+    print(f"ana.magnet_setup: debug={debug}")
+    print(f'search_path: {search_paths(MyEnv, "geom")}')
     
     yamlfile = confdata["geom"]
     if debug:
-        print("magnet_setup:", yamlfile)
+        print(f"magnet_setup: {yamlfile}, pwd={os.getcwd()}")
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -203,7 +205,10 @@ def magnet_setup(MyEnv, confdata: str, debug: bool=False):
         cad = None
         # with open(yamlfile, 'r') as cfgdata:
         with MyOpen(yamlfile, 'r', paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader = yaml.FullLoader)
+            print(f"magnet.filename={cfgdata.name}")
+            cad = getObject(cfgdata.name)
+            print(f"magnet.filename={cfgdata.name} done", flush=True)
+            
         # if isinstance(cad, Insert):
         tmp = HMagnet(MyEnv, cad, confdata, debug)
         for item in tmp[0]:
@@ -306,7 +311,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool=False):
 def setup(MyEnv, args, confdata, jsonfile, session=None):
     """
     """
-    print("ana/main")
+    print(f"ana/main: {os.getcwd()}")
     default_pathes={
         "geom" : MyEnv.yaml_repo,
         "cad" : MyEnv.cad_repo,
@@ -363,7 +368,9 @@ def main():
 
     # load appenv
     MyEnv = appenv()
-    if args.debug: print(MyEnv.template_path())
+    if args.debug: 
+        print(f"MyEnv: {MyEnv}")
+        print(f"template path: {MyEnv.template_path()}")
 
     # Get Object
     if args.datafile != None:

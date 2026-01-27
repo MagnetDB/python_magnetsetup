@@ -426,7 +426,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         if args.debug:
             print(f"Load a magnet {confdata['geom']}")
         with MyOpen(confdata["geom"], "r", paths=search_paths(MyEnv, "geom")) as f:
-            print(f.name)
+            print(f"magnet.filename={f.name}")
             cad = getObject(f.name)
             cad_basename = cad.name
 
@@ -450,7 +450,7 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
         # why do I need that???
         try:
             f = findfile(confdata["name"] + ".yaml", search_paths(MyEnv, "geom"))
-            print(f.name)
+            print(f"msite.filename: {f.name}")
             cad = getObject(f.name)
             cad_basename = cad.name
 
