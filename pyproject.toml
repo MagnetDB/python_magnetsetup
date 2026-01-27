@@ -1,29 +1,25 @@
-[build-system]
-requires = ["poetry-core>=2.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[project]
-name = "python-magnetsetup"
+[tool.poetry]
+name = "python_magnetsetup"
 version = "0.1.0"
 description = "Python helpers to setup and run HiFiMagnet simulations"
-authors = [
-    {name = "Christophe Trophime", email = "christophe.trophime@lncmi.cnrs.fr"},
-    {name = "Romain Vallet", email = "romain.vallet@lncmi.cnrs.fr"},
-    {name = "Jeremie Muzet", email = "jeremie.muzet@lncmi.cnrs.fr"},
-    {name = "Remi Caumette", email = "remicaumette@icloud.com"}
-]
-requires-python = ">=3.11"
-
-dependencies = [
-    "pyyaml>=6.0.2,<7.0.0",
-    "pandas>=1.5.3",
-    "fabric>=2.7.0",
-    "Pint>=0.24,<1.0.0",
-    "python-decouple>=3.6",
-    "requests>=2.27.1",
-    "chevron>=0.13.1",
-]
+authors = ["Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>",
+           "Romain Vallet <romain.vallet@lncmi.cnrs.fr>",
+           "Jeremie Muzet <jeremie.muzet@lncmi.cnrs.fr>",
+           "Remi Caumette <remicaumette@icloud.com>"
+          ]
 
 [tool.poetry.dependencies]
-python-magnetgeo = {path = "../python_magnetgeo", develop = true}
+python = "^3.11"
+python-magnetgeo = {path = "../python_magnetgeo", develop=true}
+fabric = "^2.7.0"
+Pint = "^0.24"
+python-decouple = "^3.6"
+requests = "^2.27.1"
+chevron = "^0.13.1"
+PyYAML = "^6.0"
 
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
