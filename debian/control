@@ -38,10 +38,8 @@ Package: python-magnetsetup-doc
 Architecture: all
 Section: doc
 Depends: ${sphinxdoc:Depends}, ${misc:Depends}
-Description: Magnet Geometry Python module (Python 3) (common documentation)
+Description: Magnet Setup Python module (Python 3) (common documentation)
  This module enable to perform the following operations
- * Define Magnet geometry as yaml file
- * Load/Create CA and Mesh with Salome (see hifimanget.salome)
- * Create Gmsh mesh from Salome XAO format
+ * Setup of cfpdes feelpp simulations
  .
  This package installs the library for Python 3.
