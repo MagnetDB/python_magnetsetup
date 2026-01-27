@@ -36,7 +36,6 @@ To use the cli mode, please refer to python_magnetapi doc.
 #### Using pip
 
 ```bash
-pip install -r requirements.txt
 pip install .
 ```
 
@@ -46,19 +45,12 @@ pip install .
 poetry install
 ```
 
-#### Using setup.py
-
-```bash
-python setup.py install
-```
-
 ### Development Installation
 
 For development work, install with dev dependencies:
 
 ```bash
-# Using pip
-pip install -r requirements_dev.txt
+# Using pip (editable mode)
 pip install -e .
 
 # Using Poetry

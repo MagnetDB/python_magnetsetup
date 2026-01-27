@@ -19,7 +19,16 @@ dependencies = [
     "PyYAML>=6.0,<7.0",
 ]
 
-[tool.poetry.group.dev.dependencies]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
