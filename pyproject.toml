@@ -10,7 +10,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "python-magnetgeo @ file:///../python_magnetgeo",
+    "python-magnetgeo",
     "fabric>=2.7.0,<3.0.0",
     "Pint>=0.24,<0.25",
     "python-decouple>=3.6,<4.0",
