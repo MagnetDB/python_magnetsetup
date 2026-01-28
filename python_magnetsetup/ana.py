@@ -12,6 +12,7 @@ import argparse
 from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
+from python_magnetgeo.utils import getObject
 from python_magnetgeo.Insert import Insert
 from python_magnetgeo.MSite import MSite
 from python_magnetgeo.Bitter import Bitter
@@ -67,9 +68,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
             Helices.append(item)
         index += Tube.get_n_elem()
 
-    logger.debug(
-        f"HMagnet: {struct.name} Tubes: {len(Tubes)} Helices: {len(Helices)}"
-    )
+    logger.debug(f"HMagnet: {struct.name} Tubes: {len(Tubes)} Helices: {len(Helices)}")
     return (Tubes, Helices, OHelices)
 
 
