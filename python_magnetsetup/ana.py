@@ -32,7 +32,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
-    logger.debug("HMagnet: %s", data)
+    logger.debug(f"HMagnet: {data}")
 
     # how to create Tubes??
     # Tube(const int n= len(struct.modelaxi.turns), const MyDouble r1 = struct.r[0], const MyDouble r2 = struct.r[1], const MyDouble l = struct.modelaxi.h??)
@@ -48,14 +48,14 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
         with MyOpen(geom, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
             cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
         nturns = len(cad.modelaxi.turns)
-        logger.debug("nturns: %s", nturns)
+        logger.debug(f"nturns: {nturns}")
         r1 = cad.r[0]
         r2 = cad.r[1]
         h = cad.modelaxi.h
         Tube = mt.Tube(nturns, r1 * 1.0e-3, r2 * 1.0e-3, h * 1.0e-3)
         Tube.set_index(index)
-        logger.debug("index: %s %s", index, Tube.get_index())
-        logger.debug("cad.modelaxi: %s", cad.modelaxi)
+        logger.debug(f"index: {index}, {Tube.get_index()}")
+        logger.debug(f"cad.modelaxi: {cad.modelaxi}")
         for n, pitch in zip(cad.modelaxi.turns, cad.modelaxi.pitch):
             Tube.set_pitch(pitch * 1.0e-3)
             Tube.set_nturn(n)
@@ -68,7 +68,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
         index += Tube.get_n_elem()
 
     logger.debug(
-        "HMagnet: %s Tubes: %d Helices: %d", struct.name, len(Tubes), len(Helices)
+        f"HMagnet: {struct.name} Tubes: {len(Tubes)} Helices: {len(Helices)}"
     )
     return (Tubes, Helices, OHelices)
 
@@ -107,7 +107,7 @@ def BMagnet(
 
         z += dz
 
-    logger.debug("BMagnet: %s %d", struct.name, len(BMagnets))
+    logger.debug(f"BMagnet: {struct.name}, {len(BMagnets)}")
     return BMagnets
 
 
@@ -126,7 +126,7 @@ def UMagnet(struct: Supra, debug: bool = False):
         nturns += 2 * dp.pancake.n
         j = nturns / struct.getArea() * 1.0e-6
 
-    logger.debug("UMagnets: %s %d", struct.name, 1)
+    logger.debug(f"UMagnets: {struct.name}, {1}")
     return mt.UnifMagnet(
         struct.r1 * 1.0e-3, struct.r0 * 1.0e-3, struct.h * 1.0e-3, j, struct.z0, f, rho
     )
@@ -187,7 +187,7 @@ def UMagnets(struct: HTSInsert, detail: str = "dblepancake", debug: bool = False
                 ro = ri + w
                 UMagnets.append(mt.UnifMagnet(ro, ri, h_t, j, zi + h_t / 2.0, f, rho))
 
-    logger.debug("UMagnets: %s %d", struct.name, len(UMagnets))
+    logger.debug(f"UMagnets: {struct.name}, {len(UMagnets)}")
     return UMagnets
 
 
@@ -198,7 +198,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool = False):
     print("magnet_setup", "debug=", debug)
 
     yamlfile = confdata["geom"]
-    logger.debug("magnet_setup: %s", yamlfile)
+    logger.debug(f"ana.magnet_setup: {yamlfile}, pwd={os.getcwd()}")
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -213,7 +213,8 @@ def magnet_setup(MyEnv, confdata: str, debug: bool = False):
         cad = None
         # with open(yamlfile, 'r') as cfgdata:
         with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
+            cad = getObject(cfgdata.name)
+        logger.info(f"magnet.filename={cfgdata.name} done")
         # if isinstance(cad, Insert):
         tmp = HMagnet(MyEnv, cad, confdata, debug)
         for item in tmp[0]:
@@ -317,7 +318,7 @@ def msite_setup(MyEnv, confdata: str, debug: bool = False):
 
 def setup(MyEnv, args, confdata, jsonfile, session=None):
     """ """
-    print("ana/main")
+    logger.info(f"ana/main: {os.getcwd()}")
     default_pathes = {
         "geom": MyEnv.yaml_repo,
         "cad": MyEnv.cad_repo,
