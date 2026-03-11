@@ -3,7 +3,8 @@ import yaml
 import copy
 import re
 
-from python_magnetgeo.Supra import Supra
+# Use lazy loading pattern for python_magnetgeo
+# from python_magnetgeo.Supra import Supra
 
 from .jsonmodel import (
     create_params_supra,
@@ -20,7 +21,9 @@ from .logging_config import get_logger
 logger = get_logger(__name__)
 
 
-def Supra_simfile(MyEnv, confdata: dict, cad: Supra, debug: bool = False):
+def Supra_simfile(MyEnv, confdata: dict, cad, debug: bool = False):
+    from python_magnetgeo.Supra import Supra
+
     print(f"Supra_simfile: cad={cad.name}")
     print(f"Supra_simfile: confdata={confdata}")
 
@@ -42,12 +45,14 @@ def Supra_setup(
     MyEnv,
     mname: str,
     confdata: dict,
-    cad: Supra,
+    cad,
     method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,
 ):
+    from python_magnetgeo.Supra import Supra
+
     print(f"Supra_setup: magnet={mname}, cad={cad.name}")
     part_thermic = []
     part_electric = []

@@ -16,7 +16,8 @@ from .objects import load_object
 
 import yaml
 
-from python_magnetgeo.Insert import Insert
+# Use lazy loading pattern for python_magnetgeo
+# from python_magnetgeo.Insert import Insert
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -162,6 +163,11 @@ def main():
     print("init:", confdata)
 
     from .file_utils import MyOpen, findfile, search_paths
+    import python_magnetgeo as pmg
+    from python_magnetgeo.Insert import Insert
+
+    # Register YAML constructors for lazy loading
+    pmg.verify_class_registration()
 
     # select a default distance unit
     yamlfile = confdata["geom"]

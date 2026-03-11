@@ -27,15 +27,16 @@ mustache templates
 import os
 import itertools
 
+# Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Insert import Insert
 # from python_magnetgeo.MSite import MSite
-from python_magnetgeo.utils import getObject
-from python_magnetgeo.MSite import MSite
-from python_magnetgeo.Insert import Insert
-from python_magnetgeo.Bitters import Bitters
-from python_magnetgeo.Supras import Supras
-from python_magnetgeo.Bitter import Bitter
-from python_magnetgeo.Supra import Supra
+# from python_magnetgeo.utils import getObject
+# from python_magnetgeo.MSite import MSite
+# from python_magnetgeo.Insert import Insert
+# from python_magnetgeo.Bitters import Bitters
+# from python_magnetgeo.Supras import Supras
+# from python_magnetgeo.Bitter import Bitter
+# from python_magnetgeo.Supra import Supra
 
 # from .config import appenv
 from .config import loadconfig, loadtemplates
@@ -68,7 +69,7 @@ logger = get_logger(__name__)
 def magnet_simfile(
     MyEnv,
     confdata: str,
-    cad: Insert | Bitters | Supras,
+    cad,
     addAir: bool = False,
     debug: bool = False,
     session=None,
@@ -76,6 +77,10 @@ def magnet_simfile(
     """
     create sim files for magnet
     """
+    from python_magnetgeo.Insert import Insert
+    from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Supras import Supras
+
     files = []
     yamlfile = confdata["geom"]
     with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
@@ -111,7 +116,7 @@ def magnet_setup(
     MyEnv,
     mname: str,
     confdata: dict,
-    cad: Insert | Bitters | Supras,
+    cad,
     method_data: list,
     templates: dict,
     current: float = 31.0e3,
@@ -120,6 +125,9 @@ def magnet_setup(
     """
     Creating dict for setup for magnet
     """
+    from python_magnetgeo.Insert import Insert
+    from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Supras import Supras
 
     print(f"magnet_setup: mname={mname}")
     logger.debug(f"magnet_setup: confdata={confdata}"),
@@ -272,10 +280,11 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
     return (mdict, mmat, mmodels, mpost)
 
 
-def msite_simfile(MyEnv, confdata: str, cad: MSite, addAir: bool = False, session=None):
+def msite_simfile(MyEnv, confdata: str, cad, addAir: bool = False, session=None):
     """
     Creating list of simulation files for msite
     """
+    from python_magnetgeo.MSite import MSite
 
     files = []
 
@@ -306,7 +315,7 @@ def msite_simfile(MyEnv, confdata: str, cad: MSite, addAir: bool = False, sessio
 def msite_setup(
     MyEnv,
     confdata: str,
-    cad: MSite,
+    cad,
     method_data: list,
     templates: dict,
     currents: dict,
@@ -316,6 +325,8 @@ def msite_setup(
     """
     Creating dict for setup for msite
     """
+    from python_magnetgeo.MSite import MSite
+
     logger.debug(f"msite_setup: confdata={confdata}")
     logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
 
@@ -390,6 +401,13 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
     """
     generate sim files
     """
+    from python_magnetgeo.utils import getObject
+    from python_magnetgeo.MSite import MSite
+    import python_magnetgeo as pmg
+
+    # Register YAML constructors for lazy loading
+    pmg.verify_class_registration()
+
     print(f"setup: currents={currents}")
 
     # loadconfig

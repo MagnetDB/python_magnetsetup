@@ -1,7 +1,8 @@
 import yaml
 import copy
 
-from python_magnetgeo.Bitter import Bitter
+# Use lazy loading pattern for python_magnetgeo
+# from python_magnetgeo.Bitter import Bitter
 
 from .jsonmodel import (
     create_params_bitter,
@@ -20,7 +21,9 @@ from .logging_config import get_logger
 logger = get_logger(__name__)
 
 
-def Bitter_simfile(MyEnv, confdata: dict, cad: Bitter, debug: bool = False):
+def Bitter_simfile(MyEnv, confdata: dict, cad, debug: bool = False):
+    from python_magnetgeo.Bitter import Bitter
+
     print(f"Bitter_simfile: cad={cad.name}")
 
     from .file_utils import MyOpen, findfile
@@ -34,12 +37,14 @@ def Bitter_setup(
     MyEnv,
     mname: str,
     confdata: dict,
-    cad: Bitter,
+    cad,
     method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,
 ):
+    from python_magnetgeo.Bitter import Bitter
+
     print(f"Bitter_setup: magnet={mname}, cad={cad.name}")
     logger.debug(f"Bitter_setup/Bitter confdata: {confdata}")
 

@@ -12,12 +12,13 @@ import argparse
 from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
-from python_magnetgeo.utils import getObject
-from python_magnetgeo.Insert import Insert
-from python_magnetgeo.MSite import MSite
-from python_magnetgeo.Bitter import Bitter
-from python_magnetgeo.Supra import Supra
-from python_magnetgeo.SupraStructure import HTSInsert
+# Use lazy loading pattern for python_magnetgeo
+# from python_magnetgeo.utils import getObject
+# from python_magnetgeo.Insert import Insert
+# from python_magnetgeo.MSite import MSite
+# from python_magnetgeo.Bitter import Bitter
+# from python_magnetgeo.Supra import Supra
+# from python_magnetgeo.SupraStructure import HTSInsert
 
 from .file_utils import MyOpen, findfile, search_paths
 from .logging_config import get_logger
@@ -27,12 +28,14 @@ logger = get_logger(__name__)
 import magnettools.magnettools as mt
 
 
-def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
+def HMagnet(MyEnv, struct, data: dict, debug: bool = False):
     """
     create view of this insert as a Helices Magnet
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
+    from python_magnetgeo.Insert import Insert
+
     logger.debug(f"HMagnet: {data}")
 
     # how to create Tubes??
@@ -41,6 +44,11 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
     OHelices = mt.VectorOfBitters()
+
+    # Register YAML constructors for lazy loading
+    import python_magnetgeo as pmg
+
+    pmg.verify_class_registration()
 
     index = 0
     for helix in data["Helix"]:
@@ -72,9 +80,7 @@ def HMagnet(MyEnv, struct: Insert, data: dict, debug: bool = False):
     return (Tubes, Helices, OHelices)
 
 
-def BMagnet(
-    struct: Bitter, material: dict, fillingfactor: float = 1, debug: bool = False
-):
+def BMagnet(struct, material: dict, fillingfactor: float = 1, debug: bool = False):
     """
     create view of this insert as a Bitter Magnet
 
@@ -84,6 +90,7 @@ def BMagnet(
 
     b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, 1/float(n), rho)
     """
+    from python_magnetgeo.Bitter import Bitter
 
     BMagnets = mt.VectorOfBitters()
 
@@ -110,12 +117,13 @@ def BMagnet(
     return BMagnets
 
 
-def UMagnet(struct: Supra, debug: bool = False):
+def UMagnet(struct, debug: bool = False):
     """
     create view of this insert as a Uniform Magnet
 
     b=mt.UnifMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
     """
+    from python_magnetgeo.Supra import Supra
 
     rho = 0
     f = struct.getFillingFactor()
@@ -131,7 +139,7 @@ def UMagnet(struct: Supra, debug: bool = False):
     )
 
 
-def UMagnets(struct: HTSInsert, detail: str = "dblepancake", debug: bool = False):
+def UMagnets(struct, detail: str = "dblepancake", debug: bool = False):
     """
     create view of this insert as a stack of Uniform Magnets
 
@@ -140,6 +148,8 @@ def UMagnets(struct: HTSInsert, detail: str = "dblepancake", debug: bool = False
     pancake: each pancake is a U Magnet
     tape: each tape is a U Magnet
     """
+    from python_magnetgeo.SupraStructure import HTSInsert
+
     rho = 0
     UMagnets = mt.VectorOfUnifs()
 
@@ -194,6 +204,14 @@ def magnet_setup(MyEnv, confdata: str, debug: bool = False):
     """
     Creating MagnetTools data struct for setup for magnet
     """
+    from python_magnetgeo.utils import getObject
+    from python_magnetgeo.Bitter import Bitter
+    from python_magnetgeo.Supra import Supra
+    import python_magnetgeo as pmg
+
+    # Register YAML constructors for lazy loading
+    pmg.verify_class_registration()
+
     print("magnet_setup", "debug=", debug)
 
     yamlfile = confdata["geom"]
@@ -234,6 +252,7 @@ def magnet_setup(MyEnv, confdata: str, debug: bool = False):
                 with MyOpen(
                     obj["geom"], "r", paths=search_paths(MyEnv, "geom")
                 ) as cfgdata:
+                    # YAML constructors already registered above
                     cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
 
                 if isinstance(cad, Bitter):

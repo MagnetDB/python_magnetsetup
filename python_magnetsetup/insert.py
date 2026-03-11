@@ -1,7 +1,8 @@
 import yaml
 import copy
 
-from python_magnetgeo.Insert import Insert
+# Use lazy loading pattern for python_magnetgeo
+# from python_magnetgeo.Insert import Insert
 
 from .flatten import flatten
 from .jsonmodel import (
@@ -23,8 +24,10 @@ import os
 
 # MyEnv: Union[Type[appenv]|None]
 def Insert_simfile(
-    MyEnv, confdata: dict, cad: Insert, addAir: bool = False, debug: bool = False
+    MyEnv, confdata: dict, cad, addAir: bool = False, debug: bool = False
 ):
+    from python_magnetgeo.Insert import Insert
+
     print(f"Insert_simfile: cad={cad.name}")
 
     files = []
@@ -114,12 +117,14 @@ def Insert_setup(
     MyEnv,
     mname: str,
     confdata: dict,
-    cad: Insert,
+    cad,
     method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,
 ):
+    from python_magnetgeo.Insert import Insert
+
     print(f"Insert_setup: mname={mname}, cad={cad.name}")
 
     part_thermic = []
