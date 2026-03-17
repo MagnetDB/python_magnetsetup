@@ -34,7 +34,7 @@ shift $((OPTIND - 1))
 
 # add parameters
 : ${VERSION:="0.1.1"}
-: ${DIST:="bookworm"}
+: ${DIST:="trixie"}
 
 # cleanup source
 find . -type d -name __pycache__ | xargs rm -rf
@@ -56,7 +56,6 @@ tar \
     --exclude=*.pem \
     --exclude=*.log \
     --exclude=*~ \
-    --exclude=pyproject.toml \
     --exclude=poetry.lock \
     -zcvf ${PACKAGE}_${VERSION}.orig.tar.gz ${SRCDIR}
 
