@@ -1,6 +1,6 @@
 [project]
 name = "python-magnetsetup"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python helpers to setup and run HiFiMagnet simulations"
 authors = [
     {name = "Christophe Trophime", email = "christophe.trophime@lncmi.cnrs.fr"},
@@ -29,6 +29,39 @@ addopts = [
     "--strict-markers",
     "--tb=short",
 ]
+
+[tool.setuptools.packages.find]
+include = ["python_magnetsetup*"]
+
+[tool.setuptools.package-data]
+"python_magnetsetup" = ["*.json", "templates/**/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in default arguments
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["python_magnetsetup"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
