@@ -2,16 +2,18 @@ Source: python-magnetsetup
 Section: python
 Priority: optional
 Maintainer: Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>
-Build-Depends: debhelper-compat (= 12),
+Build-Depends: debhelper-compat (= 13),
  dh-python,
- python3-setuptools,
+ pybuild-plugin-pyproject,
  python3-all,
+ python3-setuptools (>= 61.0),
+ python3-wheel,
  python3-gmsh,
  python3-yaml,
  python3-lxml,
  python3-pytest-runner
 Standards-Version: 4.6.0
-Homepage: https://github.com/Trophime/python_magnetsetup
+Homepage: https://github.com/MagnetDB/python_magnetsetup
 #Vcs-Browser: https://salsa.debian.org/debian/python-magnetsetup
 #Vcs-Git: https://salsa.debian.org/debian/python-magnetsetup.git
 #Testsuite: autopkgtest-pkg-python
