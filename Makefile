@@ -47,8 +47,13 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint: ## check style with flake8
-	flake8 python_magnetgeo tests
+lint: ## check style with ruff
+	ruff check python_magnetsetup tests
+	ruff format --check python_magnetsetup tests
+
+format: ## auto-format and fix lint issues with ruff
+	ruff check --fix python_magnetsetup tests
+	ruff format python_magnetsetup tests
 
 test: ## run tests quickly with the default Python
 	pytest

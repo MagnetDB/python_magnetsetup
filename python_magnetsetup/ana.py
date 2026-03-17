@@ -26,13 +26,28 @@ from .logging_config import get_logger
 logger = get_logger(__name__)
 
 import magnettools.magnettools as mt
+from typing import Any, Optional
 
 
-def HMagnet(MyEnv, struct, data: dict, debug: bool = False):
+def HMagnet(
+    MyEnv: appenv,
+    struct: Any,
+    data: dict,
+    debug: bool = False,
+) -> tuple[Any, Any, Any]:
     """
-    create view of this insert as a Helices Magnet
+    Build a MagnetTools helix-magnet representation of an Insert.
 
-    b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
+    Each helix is modelled as a :class:`mt.BitterMagnet` via :func:`BMagnet`.
+    The geometry is read from the YAML file referenced in *data*.
+
+    :param MyEnv: Application environment (provides search paths).
+    :param struct: CAD geometry object for the Insert.
+    :param data: Configuration dict containing a ``'Helix'`` list with
+        ``'geom'`` and ``'material'`` entries.
+    :param debug: Enable debug output.
+    :return: Tuple of (Tubes, Helices, OHelices) as
+        ``(mt.VectorOfTubes, mt.VectorOfBitters, mt.VectorOfBitters)``.
     """
     from python_magnetgeo.Insert import Insert
 
@@ -80,15 +95,25 @@ def HMagnet(MyEnv, struct, data: dict, debug: bool = False):
     return (Tubes, Helices, OHelices)
 
 
-def BMagnet(struct, material: dict, fillingfactor: float = 1, debug: bool = False):
+def BMagnet(
+    struct: Any,
+    material: dict,
+    fillingfactor: float = 1,
+    debug: bool = False,
+) -> Any:
     """
-    create view of this insert as a Bitter Magnet
+    Build a MagnetTools Bitter-magnet representation of a coil stack.
 
-    struct: geometry of the bitter stack
-    material: physical properties of copper alloy
-    fillingfactor: ratio of copper alloy volume over total volume
+    Each axial turn group in *struct* is converted to a
+    :class:`mt.BitterMagnet` element.
 
-    b=mt.BitterfMagnet(r2, r1, h, current_density, z_offset, 1/float(n), rho)
+    :param struct: CAD geometry object for the Bitter coil
+        (e.g. a ``python_magnetgeo.Bitter`` instance).
+    :param material: Physical properties dict; must contain
+        ``'ElectricalConductivity'`` (S/m).
+    :param fillingfactor: Ratio of conductor volume to total volume.
+    :param debug: Enable debug output.
+    :return: ``mt.VectorOfBitters`` containing one element per turn group.
     """
     from python_magnetgeo.Bitter import Bitter
 
@@ -117,11 +142,17 @@ def BMagnet(struct, material: dict, fillingfactor: float = 1, debug: bool = Fals
     return BMagnets
 
 
-def UMagnet(struct, debug: bool = False):
+def UMagnet(struct: Any, debug: bool = False) -> Any:
     """
-    create view of this insert as a Uniform Magnet
+    Build a single MagnetTools uniform-magnet representation of a supra coil.
 
-    b=mt.UnifMagnet(r2, r1, h, current_density, z_offset, fillingfactor, rho)
+    The entire coil is collapsed into one :class:`mt.UnifMagnet` element
+    with an averaged current density.
+
+    :param struct: CAD geometry object for the superconducting coil
+        (e.g. a ``python_magnetgeo.Supra`` instance).
+    :param debug: Enable debug output.
+    :return: A single :class:`mt.UnifMagnet` instance.
     """
     from python_magnetgeo.Supra import Supra
 
@@ -139,14 +170,26 @@ def UMagnet(struct, debug: bool = False):
     )
 
 
-def UMagnets(struct, detail: str = "dblepancake", debug: bool = False):
+def UMagnets(
+    struct: Any,
+    detail: str = "dblepancake",
+    debug: bool = False,
+) -> Any:
     """
-    create view of this insert as a stack of Uniform Magnets
+    Build a stack of MagnetTools uniform-magnet elements for a supra insert.
 
-    detail: control the view model
-    dblepancake: each double pancake is a U Magnet
-    pancake: each pancake is a U Magnet
-    tape: each tape is a U Magnet
+    The granularity of the decomposition is controlled by *detail*:
+
+    * ``'dblepancake'`` — one :class:`mt.UnifMagnet` per double pancake.
+    * ``'pancake'``     — one :class:`mt.UnifMagnet` per pancake.
+    * ``'tape'``        — one :class:`mt.UnifMagnet` per tape.
+
+    :param struct: CAD geometry object for the HTS insert
+        (e.g. a ``python_magnetgeo.SupraStructure.HTSInsert`` instance).
+    :param detail: Decomposition level (``'dblepancake'``, ``'pancake'``,
+        or ``'tape'``).
+    :param debug: Enable debug output.
+    :return: ``mt.VectorOfUnifs`` containing one element per sub-unit.
     """
     from python_magnetgeo.SupraStructure import HTSInsert
 
@@ -200,9 +243,25 @@ def UMagnets(struct, detail: str = "dblepancake", debug: bool = False):
     return UMagnets
 
 
-def magnet_setup(MyEnv, confdata: str, debug: bool = False):
+def magnet_setup(
+    MyEnv: appenv,
+    confdata: dict,
+    debug: bool = False,
+) -> tuple[Any, Any, Any, Any, Any, Any]:
     """
-    Creating MagnetTools data struct for setup for magnet
+    Build MagnetTools data structures for a single magnet.
+
+    Dispatches to :func:`HMagnet`, :func:`BMagnet`, or :func:`UMagnet` /
+    :func:`UMagnets` depending on the keys present in *confdata*
+    (``'Helix'``, ``'Bitter'``, or ``'Supra'``).
+
+    :param MyEnv: Application environment (provides search paths).
+    :param confdata: Magnet configuration dict.  Must contain a ``'geom'``
+        key and at least one of ``'Helix'``, ``'Bitter'``, ``'Supra'``.
+    :param debug: Enable debug output.
+    :return: Tuple ``(Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)``
+        as ``(VectorOfTubes, VectorOfBitters, VectorOfBitters,
+        VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
     from python_magnetgeo.utils import getObject
     from python_magnetgeo.Bitter import Bitter
@@ -286,9 +345,24 @@ def magnet_setup(MyEnv, confdata: str, debug: bool = False):
     return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
 
 
-def msite_setup(MyEnv, confdata: str, debug: bool = False):
+def msite_setup(
+    MyEnv: appenv,
+    confdata: dict,
+    debug: bool = False,
+) -> tuple[Any, Any, Any, Any, Any, Any]:
     """
-    Creating MagnetTools data struct for setup for msite
+    Build MagnetTools data structures for a multi-magnet site.
+
+    Iterates over every magnet listed in ``confdata['magnets']`` and
+    delegates to :func:`magnet_setup`, then merges results.
+
+    :param MyEnv: Application environment (provides search paths).
+    :param confdata: Site configuration dict containing a ``'magnets'`` list
+        of per-magnet configuration dicts.
+    :param debug: Enable debug output.
+    :return: Tuple ``(Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)``
+        as ``(VectorOfTubes, VectorOfBitters, VectorOfBitters,
+        VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
     logger.debug(f"msite_setup: confdata={confdata}")
     logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
@@ -334,8 +408,30 @@ def msite_setup(MyEnv, confdata: str, debug: bool = False):
     return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
 
 
-def setup(MyEnv, args, confdata, jsonfile, session=None):
-    """ """
+def setup(
+    MyEnv: appenv,
+    args: Any,
+    confdata: dict,
+    jsonfile: str,
+    session: Optional[Any] = None,
+) -> tuple[Any, Any, Any, Any, Any, Any]:
+    """
+    Entry-point for the MagnetTools setup workflow.
+
+    Changes to the working directory specified by *args.wd* (if set), then
+    delegates to :func:`magnet_setup` or :func:`msite_setup` depending on
+    whether *confdata* describes a single magnet (has ``'geom'`` key) or a
+    multi-magnet site.
+
+    :param MyEnv: Application environment (provides search paths and repos).
+    :param args: CLI arguments namespace.  Used fields: ``wd``, ``debug``,
+        ``verbose``.
+    :param confdata: Magnet or site configuration dict.
+    :param jsonfile: Base name of the output JSON file (used for logging).
+    :param session: Optional database session.
+    :return: Tuple ``(Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)``
+        from the underlying setup call.
+    """
     logger.info(f"ana/main: {os.getcwd()}")
     default_pathes = {
         "geom": MyEnv.yaml_repo,
@@ -369,7 +465,15 @@ def setup(MyEnv, args, confdata, jsonfile, session=None):
     return 1
 
 
-def main():
+def main() -> int:
+    """
+    CLI entry-point for the ``ana`` command.
+
+    Parses command-line arguments, loads the magnet / site configuration, and
+    calls :func:`setup` to produce the MagnetTools data structures.
+
+    :return: Exit code (``0`` on success).
+    """
     # Manage Options
     command_line = None
     parser = argparse.ArgumentParser(
