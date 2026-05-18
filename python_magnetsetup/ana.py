@@ -12,13 +12,6 @@ import argparse
 from .objects import load_object
 from .config import appenv, loadconfig, loadtemplates
 
-# Use lazy loading pattern for python_magnetgeo
-# from python_magnetgeo.utils import getObject
-# from python_magnetgeo.Insert import Insert
-# from python_magnetgeo.MSite import MSite
-# from python_magnetgeo.Bitter import Bitter
-# from python_magnetgeo.Supra import Supra
-# from python_magnetgeo.SupraStructure import HTSInsert
 
 from .file_utils import MyOpen, findfile, search_paths
 from .logging_config import get_logger
@@ -49,7 +42,6 @@ def HMagnet(
     :return: Tuple of (Tubes, Helices, OHelices) as
         ``(mt.VectorOfTubes, mt.VectorOfBitters, mt.VectorOfBitters)``.
     """
-    from python_magnetgeo.Insert import Insert
 
     logger.debug(f"HMagnet: {data}")
 
@@ -66,27 +58,24 @@ def HMagnet(
     pmg.verify_class_registration()
 
     index = 0
-    for helix in data["Helix"]:
-        material = helix["material"]
-        geom = helix["geom"]
-        with MyOpen(geom, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
-        nturns = len(cad.modelaxi.turns)
+    for helix, helix_data in zip(struct.helices, data["Helix"]):
+        material = helix_data["material"]
+        nturns = len(helix.modelaxi.turns)
         logger.debug(f"nturns: {nturns}")
-        r1 = cad.r[0]
-        r2 = cad.r[1]
-        h = cad.modelaxi.h
+        r1 = helix.r[0]
+        r2 = helix.r[1]
+        h = helix.modelaxi.h
         Tube = mt.Tube(nturns, r1 * 1.0e-3, r2 * 1.0e-3, h * 1.0e-3)
         Tube.set_index(index)
         logger.debug(f"index: {index}, {Tube.get_index()}")
-        logger.debug(f"cad.modelaxi: {cad.modelaxi}")
-        for n, pitch in zip(cad.modelaxi.turns, cad.modelaxi.pitch):
+        logger.debug(f"helix.modelaxi: {helix.modelaxi}")
+        for n, pitch in zip(helix.modelaxi.turns, helix.modelaxi.pitch):
             Tube.set_pitch(pitch * 1.0e-3)
             Tube.set_nturn(n)
 
         Tubes.append(Tube)
         fillingfactor = 1
-        tmp = BMagnet(cad, material, fillingfactor, debug)
+        tmp = BMagnet(helix, material, fillingfactor, debug)
         for item in tmp:
             Helices.append(item)
         index += Tube.get_n_elem()
@@ -264,8 +253,9 @@ def magnet_setup(
         VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
     from python_magnetgeo.utils import getObject
-    from python_magnetgeo.Bitter import Bitter
-    from python_magnetgeo.Supra import Supra
+    from python_magnetgeo.Insert import Insert
+    from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Supras import Supras
     import python_magnetgeo as pmg
 
     # Register YAML constructors for lazy loading
@@ -283,6 +273,43 @@ def magnet_setup(
     BMagnets = mt.VectorOfBitters()
     Shims = mt.VectorOfShims()
 
+    # instead load ymafile and get object -- see hifimagnet-projects/HL-41/yaml-to-bmap.py
+    cad = None
+    with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
+        cad = getObject(cfgdata.name)
+
+    logger.debug(f"magnet: {cad}, type={type(cad)}={type(cad)} debug={debug}")
+    logger.debug(f"magnet.geom: {cad.geom}")
+    if isinstance(cad, Insert):
+        tmp = HMagnet(MyEnv, cad, confdata, debug)
+        for item in tmp[0]:
+            Tubes.append(item)
+        for item in tmp[1]:
+            Helices.append(item)
+        for item in tmp[2]:
+            OHelices.append(item)
+    elif isinstance(cad, Bitters):
+        for smagnet, smagnet_data in zip(cad.magnets, confdata["Bitter"]):
+            material = smagnet_data["material"]
+            fillingfactor = 1 / smagnet.modelaxi.get_Nturns()
+            tmp = BMagnet(smagnet, material, fillingfactor, debug)
+            for item in tmp:
+                BMagnets.append(item)
+    elif isinstance(cad, Supras):
+        # get HTSinsert from cad
+        for smagnet in cad.magnets:
+            if smagnet.detail is None:
+                tmp = UMagnet(smagnet, debug)
+                UMagnets.append(tmp)
+            else:
+                sstruct = smagnet.get_magnet_struct()
+                tmp = UMagnets(sstruct, smagnet.detail, debug)
+            for item in tmp:
+                UMagnets.append(item)
+    else:
+        raise Exception(f"setup: {cad.name} unexpected cad type {str(type(cad))}")
+
+    """
     if "Helix" in confdata:
         print("Load an insert")
         # Download or Load yaml file from data repository??
@@ -302,7 +329,7 @@ def magnet_setup(
 
     for mtype in ["Bitter", "Supra"]:
         if mtype in confdata:
-            print("load a %s insert" % mtype)
+            print(f"load a {mtype} insert")
 
             # loop on mtype
             for obj in confdata[mtype]:
@@ -331,6 +358,7 @@ def magnet_setup(
                             UMagnets.append(item)
                 else:
                     raise Exception(f"setup: unexpected cad type {str(type(cad))}")
+    """
 
     # Bstacks = mt.VectorOfStacks()
     print("Helices:", len(Tubes))
