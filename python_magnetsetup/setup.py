@@ -39,7 +39,8 @@ import itertools
 # from python_magnetgeo.Supra import Supra
 
 # from .config import appenv
-from .config import loadconfig, loadtemplates
+from typing import Any, Optional
+from .config import appenv, loadconfig, loadtemplates
 
 # from .objects import load_object, load_object_from_db
 from .objects import load_object
@@ -67,15 +68,23 @@ logger = get_logger(__name__)
 
 
 def magnet_simfile(
-    MyEnv,
+    MyEnv: appenv,
     confdata: str,
-    cad,
+    cad: Any,
     addAir: bool = False,
     debug: bool = False,
-    session=None,
-):
+    session: Optional[Any] = None,
+) -> list[str]:
     """
-    create sim files for magnet
+    Create simulation files for a magnet.
+
+    :param MyEnv: Application environment.
+    :param confdata: Path to the configuration YAML file.
+    :param cad: CAD geometry object (Insert, Bitters, or Supras).
+    :param addAir: Whether to include the air region.
+    :param debug: Enable debug output.
+    :param session: Optional database session.
+    :return: List of simulation file paths.
     """
     from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Bitters import Bitters
@@ -113,17 +122,27 @@ def magnet_simfile(
 
 
 def magnet_setup(
-    MyEnv,
+    MyEnv: appenv,
     mname: str,
     confdata: dict,
-    cad,
+    cad: Any,
     method_data: list,
     templates: dict,
     current: float = 31.0e3,
     debug: bool = False,
-):
+) -> tuple[dict, dict, dict, dict]:
     """
-    Creating dict for setup for magnet
+    Create setup dicts for a magnet.
+
+    :param MyEnv: Application environment.
+    :param mname: Magnet name.
+    :param confdata: Magnet configuration data.
+    :param cad: CAD geometry object (Insert, Bitters, or Supras).
+    :param method_data: List describing solve method, time, geometry, model, cooling, units, and linearity.
+    :param templates: Dict of loaded mustache templates.
+    :param current: Applied current in Amperes.
+    :param debug: Enable debug output.
+    :return: Tuple of (mdict, mmat, mmodels, mpost) setup dicts.
     """
     from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Bitters import Bitters
@@ -154,7 +173,7 @@ def magnet_setup(
             print(f"Load a Bitters: mname={mname}")
             # if isinstance(cad, Bitter):
             for i, obj in enumerate(confdata["Bitter"]):
-                (mdict, mmat, mmodels, mpost) = Bitter_setup(
+                (tdict, tmat, tmodels, tpost) = Bitter_setup(
                     MyEnv,
                     mname,
                     obj,
@@ -191,7 +210,29 @@ def magnet_setup(
     return (mdict, mmat, mmodels, mpost)
 
 
-def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
+def _setup(
+    mname: str,
+    mtype: str,
+    cad_name: str,
+    tdict: dict,
+    tmat: dict,
+    tmodels: dict,
+    tpost: dict,
+    debug: bool,
+) -> tuple[dict, dict, dict, dict]:
+    """
+    Merge temporary setup dicts into accumulated magnet setup dicts.
+
+    :param mname: Magnet name.
+    :param mtype: Magnet type (e.g. 'Bitter', 'Supra').
+    :param cad_name: Name of the CAD geometry.
+    :param tdict: Temporary setup dict to merge.
+    :param tmat: Temporary materials dict to merge.
+    :param tmodels: Temporary models dict to merge.
+    :param tpost: Temporary postprocessing dict to merge.
+    :param debug: Enable debug output.
+    :return: Tuple of (mdict, mmat, mmodels, mpost) after merging.
+    """
 
     mdict = {}
     mmat = {}
@@ -280,9 +321,22 @@ def _setup(mname, mtype, cad_name, tdict, tmat, tmodels, tpost, debug):
     return (mdict, mmat, mmodels, mpost)
 
 
-def msite_simfile(MyEnv, confdata: str, cad, addAir: bool = False, session=None):
+def msite_simfile(
+    MyEnv: appenv,
+    confdata: str,
+    cad: Any,
+    addAir: bool = False,
+    session: Optional[Any] = None,
+) -> list[str]:
     """
-    Creating list of simulation files for msite
+    Create list of simulation files for an MSite.
+
+    :param MyEnv: Application environment.
+    :param confdata: Site configuration data or path.
+    :param cad: CAD geometry object (MSite).
+    :param addAir: Whether to include the air region.
+    :param session: Optional database session.
+    :return: List of simulation file paths.
     """
     from python_magnetgeo.MSite import MSite
 
@@ -313,17 +367,27 @@ def msite_simfile(MyEnv, confdata: str, cad, addAir: bool = False, session=None)
 
 
 def msite_setup(
-    MyEnv,
+    MyEnv: appenv,
     confdata: str,
-    cad,
+    cad: Any,
     method_data: list,
     templates: dict,
     currents: dict,
     debug: bool = False,
-    session=None,
-):
+    session: Optional[Any] = None,
+) -> tuple[dict, dict, dict, dict]:
     """
-    Creating dict for setup for msite
+    Create setup dicts for an MSite.
+
+    :param MyEnv: Application environment.
+    :param confdata: Site configuration data or path.
+    :param cad: CAD geometry object (MSite).
+    :param method_data: List describing solve method, time, geometry, model, cooling, units, and linearity.
+    :param templates: Dict of loaded mustache templates.
+    :param currents: Dict mapping magnet names to current values and types.
+    :param debug: Enable debug output.
+    :param session: Optional database session.
+    :return: Tuple of (mdict, mmat, mmodels, mpost) setup dicts.
     """
     from python_magnetgeo.MSite import MSite
 
@@ -397,9 +461,24 @@ def msite_setup(
     return (mdict, mmat, mmodels, mpost)
 
 
-def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
+def setup(
+    MyEnv: appenv,
+    args: Any,
+    confdata: dict,
+    jsonfile: str,
+    currents: dict,
+    session: Optional[Any] = None,
+) -> tuple[str, str, str, str, str, list]:
     """
-    generate sim files
+    Generate simulation files for a magnet or site.
+
+    :param MyEnv: Application environment.
+    :param args: CLI arguments namespace (method, time, geom, model, cooling, nonlinear, wd, etc.).
+    :param confdata: Configuration data dict for the magnet or site.
+    :param jsonfile: Base name for the output JSON simulation file.
+    :param currents: Dict mapping magnet names to current values and types.
+    :param session: Optional database session.
+    :return: Tuple of (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles).
     """
     from python_magnetgeo.utils import getObject
     from python_magnetgeo.MSite import MSite
@@ -577,10 +656,26 @@ def setup(MyEnv, args, confdata, jsonfile: str, currents: dict, session=None):
 
 
 def commissioning_setup(
-    MyEnv, args, confdata, jsonfile: str, currents: dict, session=None
-):
+    MyEnv: appenv,
+    args: Any,
+    confdata: dict,
+    jsonfile: str,
+    currents: dict,
+    session: Optional[Any] = None,
+) -> dict:
     """
-    generate sim files for commissiong
+    Generate simulation files for commissioning runs.
+
+    Calls :func:`setup` for every combination of cooling, friction, and
+    heat-correlation parameters specified in *args*.
+
+    :param MyEnv: Application environment.
+    :param args: CLI arguments namespace (method, time, geom, model, cooling, friction, hcorrelation, wd, etc.).
+    :param confdata: Configuration data dict for the magnet or site.
+    :param jsonfile: Base name for the output JSON simulation file.
+    :param currents: Dict mapping magnet names to current values and types.
+    :param session: Optional database session.
+    :return: Dict mapping working-directory keys to (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) tuples.
     """
     import copy
 
@@ -636,8 +731,8 @@ def commissioning_setup(
 
 
 def setup_cmds(
-    MyEnv,
-    args,
+    MyEnv: appenv,
+    args: Any,
     node_spec: NodeSpec,
     yamlfile: str,
     cfgfile: str,
@@ -647,12 +742,26 @@ def setup_cmds(
     csvfiles: list,
     root_directory: str,
     currents: dict,
-):
+) -> dict:
     """
-    create cmds
+    Create shell commands for meshing, partitioning, running, and post-processing.
 
-    Watchout: gsmh/salome base mesh is always in millimeter
-    For simulation it is madatory to use a mesh in meter except maybe for HDG
+    .. warning::
+        gmsh/salome base mesh is always in millimetre; for simulation it is
+        mandatory to use a mesh in metre, except possibly for HDG.
+
+    :param MyEnv: Application environment.
+    :param args: CLI arguments namespace (method, time, geom, model, cooling, np, debug, etc.).
+    :param node_spec: Node specification describing available cores, threading, and job manager.
+    :param yamlfile: Path to the YAML geometry file.
+    :param cfgfile: Path to the Feel++ CFG file.
+    :param jsonfile: Path to the Feel++ JSON model file.
+    :param xaofile: Path to the XAO CAD file.
+    :param meshfile: Path to the mesh file.
+    :param csvfiles: List of CSV files to include in the setup.
+    :param root_directory: Root working directory for the simulation.
+    :param currents: Dict mapping magnet names to current values and types.
+    :return: Dict of named shell commands (CAD, Mesh, Partition, Run, Workflow, etc.).
     """
 
     # loadconfig
@@ -820,15 +929,28 @@ def setup_cmds(
 
 
 def commissioning_cmds(
-    MyEnv,
-    args,
+    MyEnv: appenv,
+    args: Any,
     node_spec: NodeSpec,
     commissioning_data: dict,
     root_directory: str,
     currents: dict,
-):
+) -> dict:
     """
-    create cmds for commissioning
+    Create shell commands for commissioning runs across multiple scenarios.
+
+    Iterates over all (cooling, friction, heat-correlation) combinations
+    present in *commissioning_data* and builds the corresponding command set.
+
+    :param MyEnv: Application environment.
+    :param args: CLI arguments namespace (method, time, geom, np, cooling, friction, hcorrelation, etc.).
+    :param node_spec: Node specification describing available cores, threading, and job manager.
+    :param commissioning_data: Dict keyed by working-directory path, each value being a
+        (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles) tuple as returned by
+        :func:`commissioning_setup`.
+    :param root_directory: Root working directory for the simulation results.
+    :param currents: Dict mapping magnet names to current values and types.
+    :return: Dict of named shell commands for the commissioning workflow.
     """
     import copy
 
