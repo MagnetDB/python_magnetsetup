@@ -1,3 +1,9 @@
+python-magnetsetup (0.1.1-1) UNRELEASED; urgency=medium
+
+  * rebuild for trixie
+
+ -- Christophe Trophime <christophe.trophime@lncmi.cnrs.fr>  Mon, 16 Mar 2026 18:17:41 +0100
+
 python-magnetsetup (0.1.0-8.10) unstable; urgency=medium
 
   * add Run and Postprocessing to auto
