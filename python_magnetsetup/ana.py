@@ -261,7 +261,7 @@ def magnet_setup(
     # Register YAML constructors for lazy loading
     pmg.verify_class_registration()
 
-    print("magnet_setup", "debug=", debug)
+    # print("magnet_setup", "debug=", debug)
 
     yamlfile = confdata["geom"]
     logger.debug(f"ana.magnet_setup: {yamlfile}, pwd={os.getcwd()}")
@@ -278,8 +278,9 @@ def magnet_setup(
     with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
         cad = getObject(cfgdata.name)
 
+    # print(f"magnet: {cad}, type={type(cad)}={type(cad)} debug={debug}")
     logger.debug(f"magnet: {cad}, type={type(cad)}={type(cad)} debug={debug}")
-    logger.debug(f"magnet.geom: {cad.geom}")
+    logger.debug(f"magnet.geom: {yamlfile}")
     if isinstance(cad, Insert):
         tmp = HMagnet(MyEnv, cad, confdata, debug)
         for item in tmp[0]:
@@ -309,65 +310,14 @@ def magnet_setup(
     else:
         raise Exception(f"setup: {cad.name} unexpected cad type {str(type(cad))}")
 
-    """
-    if "Helix" in confdata:
-        print("Load an insert")
-        # Download or Load yaml file from data repository??
-        cad = None
-        # with open(yamlfile, 'r') as cfgdata:
-        with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
-            cad = getObject(cfgdata.name)
-        logger.info(f"magnet.filename={cfgdata.name} done")
-        # if isinstance(cad, Insert):
-        tmp = HMagnet(MyEnv, cad, confdata, debug)
-        for item in tmp[0]:
-            Tubes.append(item)
-        for item in tmp[1]:
-            Helices.append(item)
-        for item in tmp[2]:
-            OHelices.append(item)
-
-    for mtype in ["Bitter", "Supra"]:
-        if mtype in confdata:
-            print(f"load a {mtype} insert")
-
-            # loop on mtype
-            for obj in confdata[mtype]:
-                print("obj:", obj)
-                cad = None
-                with MyOpen(
-                    obj["geom"], "r", paths=search_paths(MyEnv, "geom")
-                ) as cfgdata:
-                    # YAML constructors already registered above
-                    cad = yaml.load(cfgdata, Loader=yaml.FullLoader)
-
-                if isinstance(cad, Bitter):
-                    fillingfactor = 1 / cad.modelaxi.get_Nturns()
-                    tmp = BMagnet(cad, obj["material"], fillingfactor, debug)
-                    for item in tmp:
-                        BMagnets.append(item)
-                elif isinstance(cad, Supra):
-                    # get HTSinsert from cad
-                    if cad.detail is None:
-                        tmp = UMagnet(cad, debug)
-                        UMagnets.append(tmp)
-                    else:
-                        sstruct = cad.get_magnet_struct()
-                        tmp = UMagnets(sstruct, cad.detail, debug)
-                        for item in tmp:
-                            UMagnets.append(item)
-                else:
-                    raise Exception(f"setup: unexpected cad type {str(type(cad))}")
-    """
-
     # Bstacks = mt.VectorOfStacks()
-    print("Helices:", len(Tubes))
+    # print("Helices:", len(Tubes))
     if len(BMagnets) != 0:
         Bstacks = mt.create_Bstack(BMagnets)
-        print("Bstacks:", len(Bstacks))
+        # print("Bstacks:", len(Bstacks))
     if len(UMagnets) != 0:
         Ustacks = mt.create_Ustack(UMagnets)
-        print("UStacks:", len(Ustacks))
+        # print("UStacks:", len(Ustacks))
     # print("\n")
 
     return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
@@ -393,7 +343,9 @@ def msite_setup(
         VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
     logger.debug(f"msite_setup: confdata={confdata}")
-    logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
+    logger.info(
+        f"msite_setup: confdata[magnets]={[magnet['geom'] for magnet in confdata['magnets']]}"
+    )
 
     Tubes = mt.VectorOfTubes()
     Helices = mt.VectorOfBitters()
@@ -402,11 +354,18 @@ def msite_setup(
     BMagnets = mt.VectorOfBitters()
     Shims = mt.VectorOfShims()
 
+    """
+    print(
+        f"msite_setup: {confdata['name']} with {len(confdata['magnets'])} magnets, debug={debug}"
+    )
+    print(f"msite_setup: confdata={confdata.keys()}")
     for magnet in confdata["magnets"]:
-        logger.debug(
-            f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}"
-        )
-        logger.debug(f"mconfdata[geom]: {magnet['geom']}")
+        print(f"magnet: {magnet.keys()}")
+        print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
+    """
+
+    for magnet in confdata["magnets"]:
+        logger.info(f"magnet: {magnet['geom']}, debug={debug}")
         tmp = magnet_setup(MyEnv, magnet, debug)
 
         # pack magnets
@@ -424,14 +383,13 @@ def msite_setup(
             Shims.append(item)
 
     # Bstacks = mt.VectorOfStacks()
-    print("\nHelices:", len(Tubes))
+    logger.info(f"Helices: {len(Tubes)}")
     if len(BMagnets) != 0:
         Bstacks = mt.create_Bstack(BMagnets)
-        print("\nBstacks:", len(Bstacks))
+        logger.info(f"Bstacks: {len(Bstacks)}")
     if len(UMagnets) != 0:
         Ustacks = mt.create_Ustack(UMagnets)
-        print("\nUStacks:", len(Ustacks))
-    print("\n")
+        logger.info(f"UStacks: {len(Ustacks)}")
 
     return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
 
