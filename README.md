@@ -98,19 +98,19 @@ python -m python_magnetsetup.ana --datafile HL-34-data.json --debug --verbose
 # From magnetdb (magnet name)
 python -m python_magnetsetup.ana --magnet HL-34
 
-# From magnetdb (site name)
-python -m python_magnetsetup.ana --msite HL-31
+# From magnetdb (assembly name)
+python -m python_magnetsetup.ana --assembly HL-31
 ```
 
 **Options:**
 - `--datafile FILE` - Input data file (e.g., HL-34-data.json)
 - `--wd DIR` - Set working directory
 - `--magnet NAME` - Magnet name from magnetdb (e.g., HL-34)
-- `--msite NAME` - MSite name from magnetdb (e.g., HL-31)
+- `--assembly NAME` - Assembly name from magnetdb (e.g., HL-31)
 - `--debug` - Activate debug mode
 - `--verbose` - Activate verbose output
 
-**Note:** `--magnet` and `--msite` are mutually exclusive. Cannot specify both `--datafile` and `--magnet`/`--msite`.
+**Note:** `--magnet` and `--assembly` are mutually exclusive. Cannot specify both `--datafile` and `--magnet`/`--assembly`.
 
 #### Converting Units (units.py)
 
