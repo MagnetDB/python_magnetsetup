@@ -29,9 +29,7 @@ import itertools
 
 # Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Insert import Insert
-# from python_magnetgeo.MSite import MSite
 # from python_magnetgeo.utils import getObject
-# from python_magnetgeo.MSite import MSite
 # from python_magnetgeo.Insert import Insert
 # from python_magnetgeo.Bitters import Bitters
 # from python_magnetgeo.Supras import Supras
@@ -321,7 +319,7 @@ def _setup(
     return (mdict, mmat, mmodels, mpost)
 
 
-def msite_simfile(
+def assembly_simfile(
     MyEnv: appenv,
     confdata: str,
     cad: Any,
@@ -329,16 +327,15 @@ def msite_simfile(
     session: Optional[Any] = None,
 ) -> list[str]:
     """
-    Create list of simulation files for an MSite.
+    Create list of simulation files for an Assembly.
 
     :param MyEnv: Application environment.
     :param confdata: Site configuration data or path.
-    :param cad: CAD geometry object (MSite).
+    :param cad: CAD geometry object (Assembly).
     :param addAir: Whether to include the air region.
     :param session: Optional database session.
     :return: List of simulation file paths.
     """
-    from python_magnetgeo.MSite import MSite
 
     files = []
 
@@ -366,7 +363,7 @@ def msite_simfile(
     return files
 
 
-def msite_setup(
+def assembly_setup(
     MyEnv: appenv,
     confdata: str,
     cad: Any,
@@ -377,11 +374,11 @@ def msite_setup(
     session: Optional[Any] = None,
 ) -> tuple[dict, dict, dict, dict]:
     """
-    Create setup dicts for an MSite.
+    Create setup dicts for an Assembly.
 
     :param MyEnv: Application environment.
     :param confdata: Site configuration data or path.
-    :param cad: CAD geometry object (MSite).
+    :param cad: CAD geometry object (Assembly).
     :param method_data: List describing solve method, time, geometry, model, cooling, units, and linearity.
     :param templates: Dict of loaded mustache templates.
     :param currents: Dict mapping magnet names to current values and types.
@@ -389,10 +386,9 @@ def msite_setup(
     :param session: Optional database session.
     :return: Tuple of (mdict, mmat, mmodels, mpost) setup dicts.
     """
-    from python_magnetgeo.MSite import MSite
 
-    logger.debug(f"msite_setup: confdata={confdata}")
-    logger.debug(f"msite_setup: confdata[magnets]={confdata['magnets']}")
+    logger.debug(f"assembly_setup: confdata={confdata}")
+    logger.debug(f"assembly_setup: confdata[magnets]={confdata['magnets']}")
 
     mdict = {}
     mmat = {}
@@ -401,8 +397,8 @@ def msite_setup(
 
     for i, magnet in enumerate(confdata["magnets"]):
         mname = list(magnet.keys())[0]
-        print(f"msite_setup: magnet_setup[{mname}]")
-        logger.debug(f"msite_setup: magnet_setup[{mname}]: {magnet}, confdata={magnet}")
+        print(f"assembly_setup: magnet_setup[{mname}]")
+        logger.debug(f"assembly_setup: magnet_setup[{mname}]: {magnet}, confdata={magnet}")
 
         mconfdata = magnet[mname]
         mcad = cad.magnets[i]
@@ -410,18 +406,18 @@ def msite_setup(
         (tdict, tmat, tmodels, tpost) = magnet_setup(
             MyEnv, mname, mconfdata, mcad, method_data, templates, current, debug
         )
-        # print(f"msite_setup({mname}): tdict={tdict}")
-        # print(f"msite_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
-        # print(f"msite_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
+        # print(f"assembly_setup({mname}): tdict={tdict}")
+        # print(f"assembly_setup({mname}): tdict[init_temp]={tdict['init_temp']}")
+        # print(f"assembly_setup({mname}): tdict[power_magnet]={tdict['power_magnet']}")
         logger.debug(f"tpost[{mname}][Current]: {tpost['Current']}")
 
-        NMerge(tdict, mdict, debug, name=f"msite_setup: merge(mdict,tdict) for {mname}")
+        NMerge(tdict, mdict, debug, name=f"assembly_setup: merge(mdict,tdict) for {mname}")
         # logger.debug("tdict[part_electric]:", tdict['part_electric'])
         # logger.debug("tdict[part_thermic]:", tdict['part_thermic'])
         # logger.debug("mdict[part_electric]:", mdict['part_electric'])
         # logger.debug("mdict[part_thermic]:", mdict['part_thermic'])
 
-        NMerge(tmat, mmat, debug, "msite_setup/tmat")
+        NMerge(tmat, mmat, debug, "assembly_setup/tmat")
         logger.debug(f"mmat: {mmat}")
 
         logger.debug(f"tmodels: {tmodels}")
@@ -432,10 +428,10 @@ def msite_setup(
                 tmodels[physic],
                 mmodels[physic],
                 debug,
-                name="msite_setup mmodels ",
+                name="assembly_setup mmodels ",
             )
 
-        NMerge(tpost, mpost, debug, "msite_setup/tpost")
+        NMerge(tpost, mpost, debug, "assembly_setup/tpost")
 
         tdict.clear()
         tmat.clear()
@@ -449,12 +445,12 @@ def msite_setup(
                     list_current = list(set(list_current + item["part_electric"]))
             if list_current:
                 mpost[key] = [{"part_electric": list_current}]
-                logger.debug(f"msite_setup {mname}: force mpost[{key}]={mpost[key]}")
+                logger.debug(f"assembly_setup {mname}: force mpost[{key}]={mpost[key]}")
         logger.debug(f"NewMerge: {mpost}")
 
-    # print(f"msite_setup: mdict={mdict}")
-    # print(f"msite_setup: mdict[init_temp]={mdict['init_temp']}")
-    # print(f"msite_setup: mdict[power_magnet]={mdict['power_magnet']}")
+    # print(f"assembly_setup: mdict={mdict}")
+    # print(f"assembly_setup: mdict[init_temp]={mdict['init_temp']}")
+    # print(f"assembly_setup: mdict[power_magnet]={mdict['power_magnet']}")
 
     logger.debug(f"mpost: {mpost}")
     logger.debug(f"mdict: {mdict}")
@@ -481,7 +477,6 @@ def setup(
     :return: Tuple of (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles).
     """
     from python_magnetgeo.utils import getObject
-    from python_magnetgeo.MSite import MSite
     import python_magnetgeo as pmg
 
     # Register YAML constructors for lazy loading
@@ -541,7 +536,7 @@ def setup(
         )
     else:
         if args.debug:
-            print(f"Load a msite {confdata['name']}")
+            print(f"Load an assembly {confdata['name']}")
         cad_basename = confdata["name"]
 
         # why do I need that???
@@ -555,7 +550,7 @@ def setup(
             print(f"setup: {e}")
 
         # print(f"{confdata['name']}: {confdata}")
-        (mdict, mmat, mmodels, mpost) = msite_setup(
+        (mdict, mmat, mmodels, mpost) = assembly_setup(
             MyEnv,
             confdata,
             cad,
@@ -601,7 +596,7 @@ def setup(
     # TODO create_mesh() or load_mesh()
     # generate properly meshfile for cfg
     # generate solver section for cfg
-    # here name is from args (aka name of magnet and/or msite if from db)
+    # here name is from args (aka name of magnet and/or assembly if from db)
     create_cfg(
         cfgfile,
         os.path.basename(name),

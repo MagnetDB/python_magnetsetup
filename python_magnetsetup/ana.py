@@ -437,14 +437,16 @@ def setup(
         print(f"Load a magnet {jsonfile}, debug: {args.debug}")
         return magnet_setup(MyEnv, confdata, args.debug or args.verbose)
     else:
-        print(f"Load a msite {confdata['name']}, debug: {args.debug}")
+        print(f"Load an assembly {confdata['name']}, debug: {args.debug}")
         # print("confdata:", confdata)
 
         # why do I need that???
-        # would be better to do that when creating a msite in db
+        # would be better to do that when creating an assembly in db
         if not findfile(f"{confdata['name']}.yaml", paths=search_paths(MyEnv, "geom")):
+            from python_magnetgeo.Assembly import Assembly
+
             with open(f"{confdata['name']}.yaml", "x") as out:
-                out.write("!<MSite>\n")
+                out.write(f"!<{Assembly.yaml_tag}>\n")
                 yaml.dump(confdata, out)
         return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)
 
@@ -473,8 +475,11 @@ def main() -> int:
         "--magnet", help="Magnet name from magnetdb (ex. HL-34)", default=None
     )
     parser.add_argument(
-        "--msite", help="MSite name from magnetdb (ex. HL-34)", default=None
+        "--assembly", help="Assembly name from magnetdb (ex. HL-34)", default=None
     )
+    parser.add_argument(
+        "--msite", dest="assembly", default=None, help=argparse.SUPPRESS
+    )  # deprecated alias — keep for one release cycle, then remove
 
     parser.add_argument("--debug", help="activate debug", action="store_true")
     parser.add_argument("--verbose", help="activate verbose", action="store_true")
@@ -483,12 +488,12 @@ def main() -> int:
     if args.debug:
         print(f"Arguments: {str(args._)}")
 
-    # make datafile/[magnet|msite] exclusive one or the other
-    if args.magnet != None and args.msite:
-        raise Exception("cannot specify both magnet and msite")
+    # make datafile/[magnet|assembly] exclusive one or the other
+    if args.magnet != None and args.assembly:
+        raise Exception("cannot specify both magnet and assembly")
     if args.datafile != None:
-        if args.magnet != None or args.msite != None:
-            raise Exception("cannot specify both datafile and magnet or msite")
+        if args.magnet != None or args.assembly != None:
+            raise Exception("cannot specify both datafile and magnet or assembly")
 
     # load appenv
     MyEnv = appenv()
@@ -504,9 +509,9 @@ def main() -> int:
     #     confdata = load_object_from_db(MyEnv, "magnet", args.magnet, args.debug)
     #     jsonfile = args.magnet
 
-    # if args.msite != None:
-    #     confdata = load_object_from_db(MyEnv, "msite", args.msite, args.debug)
-    #     jsonfile = args.msite
+    # if args.assembly != None:
+    #     confdata = load_object_from_db(MyEnv, "assembly", args.assembly, args.debug)
+    #     jsonfile = args.assembly
 
     setup(MyEnv, args, confdata, jsonfile)
     return 0
