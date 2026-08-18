@@ -323,7 +323,7 @@ def magnet_setup(
     return (Tubes, Helices, OHelices, BMagnets, UMagnets, Shims)
 
 
-def msite_setup(
+def assembly_setup(
     MyEnv: appenv,
     confdata: dict,
     debug: bool = False,
@@ -342,9 +342,9 @@ def msite_setup(
         as ``(VectorOfTubes, VectorOfBitters, VectorOfBitters,
         VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
-    logger.debug(f"msite_setup: confdata={confdata}")
+    logger.debug(f"assembly_setup: confdata={confdata}")
     logger.info(
-        f"msite_setup: confdata[magnets]={[magnet['geom'] for magnet in confdata['magnets']]}"
+        f"assembly_setup: confdata[magnets]={[magnet['geom'] for magnet in confdata['magnets']]}"
     )
 
     Tubes = mt.VectorOfTubes()
@@ -356,9 +356,9 @@ def msite_setup(
 
     """
     print(
-        f"msite_setup: {confdata['name']} with {len(confdata['magnets'])} magnets, debug={debug}"
+        f"assembly_setup: {confdata['name']} with {len(confdata['magnets'])} magnets, debug={debug}"
     )
-    print(f"msite_setup: confdata={confdata.keys()}")
+    print(f"assembly_setup: confdata={confdata.keys()}")
     for magnet in confdata["magnets"]:
         print(f"magnet: {magnet.keys()}")
         print(f"magnet: {magnet}, type={type(magnet)}={type(magnet)} debug={debug}")
@@ -405,7 +405,7 @@ def setup(
     Entry-point for the MagnetTools setup workflow.
 
     Changes to the working directory specified by *args.wd* (if set), then
-    delegates to :func:`magnet_setup` or :func:`msite_setup` depending on
+    delegates to :func:`magnet_setup` or :func:`assembly_setup` depending on
     whether *confdata* describes a single magnet (has ``'geom'`` key) or a
     multi-magnet site.
 
@@ -448,7 +448,7 @@ def setup(
             with open(f"{confdata['name']}.yaml", "x") as out:
                 out.write(f"!<{Assembly.yaml_tag}>\n")
                 yaml.dump(confdata, out)
-        return msite_setup(MyEnv, confdata, args.debug or args.verbose, session)
+        return assembly_setup(MyEnv, confdata, args.debug or args.verbose, session)
 
     return 1
 
