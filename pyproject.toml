@@ -19,6 +19,16 @@ dependencies = [
     "PyYAML>=6.0,<7.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-cov",
+    "ruff",
+    "ty",
+    "bandit[toml]",
+    "pre-commit",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -62,6 +72,29 @@ known-first-party = ["python_magnetsetup"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.src]
+exclude = ["build", "debian", "docs", "examples"]
+
+[tool.ty.rules]
+# python_magnetgeo, fabric, chevron... are not installed in the pre-commit
+# environment, so imports cannot be resolved there
+unresolved-import = "warn"
+
+# Bandit configuration
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    "build",
+    "debian",
+    "docs",
+    "examples",
+    ".venv",
+    "venv",
+]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]

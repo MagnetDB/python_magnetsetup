@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+
+  # Local hook instead of astral-sh/ty-pre-commit: that one runs `uv check`,
+  # which fails because python-magnetgeo is not resolvable from PyPI here
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty
+        entry: ty check
+        language: python
+        additional_dependencies: ["ty==0.0.85"]
+        types_or: [python, pyi]
+        pass_filenames: false
+        require_serial: true
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]

@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: clean clean-test clean-pyc clean-build docs help lint format typecheck security check
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -50,6 +50,14 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with ruff
 	ruff check python_magnetsetup tests
 	ruff format --check python_magnetsetup tests
+
+typecheck: ## check types with ty
+	ty check
+
+security: ## check for security issues with bandit
+	bandit -c pyproject.toml -r python_magnetsetup
+
+check: lint typecheck security ## run all static checks (ruff, ty, bandit)
 
 format: ## auto-format and fix lint issues with ruff
 	ruff check --fix python_magnetsetup tests
