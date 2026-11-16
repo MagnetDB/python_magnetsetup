@@ -3,22 +3,20 @@ Check for unit consistency
 Depending on Length base unit
 """
 
-import sys
 import os
-
 import warnings
-from pint import UnitRegistry, Unit, Quantity
-
-from .config import appenv, loadconfig
-
-# from .objects import load_object, load_object_from_db
-from .objects import load_object
 
 import yaml
+from pint import Quantity, UnitRegistry
+
+from .config import appenv, loadconfig
 
 # Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Insert import Insert
 from .logging_config import get_logger
+
+# from .objects import load_object, load_object_from_db
+from .objects import load_object
 
 logger = get_logger(__name__)
 
@@ -162,9 +160,10 @@ def main():
 
     print("init:", confdata)
 
-    from .file_utils import MyOpen, findfile, search_paths
     import python_magnetgeo as pmg
     from python_magnetgeo.Insert import Insert
+
+    from .file_utils import MyOpen, search_paths
 
     # Register YAML constructors for lazy loading
     pmg.verify_class_registration()

@@ -1,6 +1,6 @@
-import os
-import json
 import enum
+import json
+import os
 from dataclasses import dataclass, field
 
 from .job import JobManager, JobManagerType
@@ -34,7 +34,7 @@ def load_machines(debug: bool = False):
     logger.debug("load_machines")
 
     default_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(default_path, "machines.json"), "r") as cfg:
+    with open(os.path.join(default_path, "machines.json")) as cfg:
         logger.debug("load_machines from: %s", cfg.name)
         data = json.load(cfg)
         logger.debug("data=%s", data)

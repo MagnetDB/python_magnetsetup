@@ -2,8 +2,9 @@
 file utils
 """
 
-import os
 import errno
+import os
+
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -35,7 +36,7 @@ def findfile(searchfile, paths=None, debug: bool = False):
     raise FileNotFoundError(errno.ENOENT, f"cannot find {searchfile} in paths:{paths}")
 
 
-class MyOpen(object):
+class MyOpen:
     """
     Check if `f` is a file name and open the file in `mode`.
     A context manager.

@@ -5,16 +5,12 @@ Console script for paraview.
 pvpython pv-temperature.py --cfgfile cfgfile --jsonfile jsonfile --expr heat.example --exprlegend 'T [K]'
 """
 
-import os
-import sys
-
 import argparse
-from argparse import RawTextHelpFormatter
-
-import re
 import json
-
-import argparse
+import os
+import re
+import sys
+from argparse import RawTextHelpFormatter
 
 epilog = "The choice of exprs is actually linked with the choosen method following this table\n"
 
@@ -43,11 +39,12 @@ if args.wd:
 
 #### import the simple module from the paraview
 from paraview.simple import *
+
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
 # directory: read cfg, directory=name
-with open(args.cfgfile, 'r') as f:
+with open(args.cfgfile) as f:
     directory = re.sub('directory=', '', f.readline(),  flags=re.DOTALL)
 
 # get method/time/geom from directory
@@ -88,9 +85,9 @@ exportcase.PointArrays = [ pfields[key][0] for key in sorted(pfields.keys()) ]
 expr0 = sorted(pfields.keys())[0]
 print(f'1st expr: {expr0} --> {pfields[expr0][1]}')
 
-if not args.expr in pfields:
+if args.expr not in pfields:
     print(f'{args.expr} is not a valid field')
-    print(f'valid values are:',[expr for key in pfields])
+    print('valid values are:',[expr for key in pfields])
     sys.exit(1)
 
 print(f'Display {pfields[args.expr][0]}')
@@ -177,7 +174,7 @@ cfpdesheattemperatureLUTColorBar = GetScalarBar(cfpdesheattemperatureLUT, render
 
 # Properties modified on cfpdesheattemperatureLUTColorBar
 cfpdesheattemperatureLUTColorBar.WindowLocation = 'UpperRightCorner'
-cfpdesheattemperatureLUTColorBar.Title = args.exprlegend # TODO custom 
+cfpdesheattemperatureLUTColorBar.Title = args.exprlegend # TODO custom
 cfpdesheattemperatureLUTColorBar.TitleFontSize = 24
 
 #================================================================

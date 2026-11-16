@@ -2,18 +2,11 @@
 Tests for logging functionality in python_magnetsetup.
 """
 
-import os
-import tempfile
 import logging
+import tempfile
 from pathlib import Path
 
-import pytest
-
-from python_magnetsetup.logging_config import (
-    setup_logging,
-    get_logger,
-    init_default_logging
-)
+from python_magnetsetup.logging_config import get_logger, init_default_logging, setup_logging
 
 
 class TestLoggingConfig:
@@ -52,14 +45,14 @@ class TestLoggingConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             log_file = Path(tmpdir) / 'test.log'
             logger = setup_logging(log_file=str(log_file), level='INFO')
-            
+
             # Log a test message
             logger.info("Test message")
-            
+
             # Flush handlers
             for handler in logger.handlers:
                 handler.flush()
-            
+
             # Check file was created and contains message
             assert log_file.exists()
             content = log_file.read_text()
@@ -70,21 +63,21 @@ class TestLoggingConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             log_file = Path(tmpdir) / 'subdir' / 'test.log'
             logger = setup_logging(log_file=str(log_file))
-            
+
             logger.info("Test")
             for handler in logger.handlers:
                 handler.flush()
-            
+
             assert log_file.parent.exists()
             assert log_file.exists()
 
     def test_setup_logging_no_console(self):
         """Test setup_logging without console handler."""
         logger = setup_logging(console=False)
-        
+
         # Should have no StreamHandler
-        stream_handlers = [h for h in logger.handlers 
-                          if isinstance(h, logging.StreamHandler) 
+        stream_handlers = [h for h in logger.handlers
+                          if isinstance(h, logging.StreamHandler)
                           and not isinstance(h, logging.handlers.RotatingFileHandler)]
         assert len(stream_handlers) == 0
 
@@ -92,7 +85,7 @@ class TestLoggingConfig:
         """Test setup_logging with custom format."""
         custom_format = '%(levelname)s - %(message)s'
         logger = setup_logging(log_format=custom_format)
-        
+
         # Check that at least one handler has the custom format
         handler_formats = [h.formatter._fmt for h in logger.handlers if h.formatter]
         assert custom_format in handler_formats
@@ -108,13 +101,13 @@ class TestLoggingConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             log_file = Path(tmpdir) / 'env_test.log'
             monkeypatch.setenv('MAGNETSETUP_LOG_FILE', str(log_file))
-            
+
             logger = setup_logging()
             logger.info("Environment test")
-            
+
             for handler in logger.handlers:
                 handler.flush()
-            
+
             assert log_file.exists()
 
     def test_init_default_logging(self):
@@ -127,7 +120,7 @@ class TestLoggingConfig:
         """Test that child loggers inherit from parent."""
         parent_logger = setup_logging(level='DEBUG')
         child_logger = get_logger('test_child')
-        
+
         # Child should inherit settings from parent
         assert child_logger.parent == parent_logger or \
                'python_magnetsetup' in child_logger.name
@@ -141,11 +134,11 @@ class TestLoggingConfig:
                 max_bytes=1024,
                 backup_count=3
             )
-            
+
             # Find the RotatingFileHandler
-            file_handlers = [h for h in logger.handlers 
+            file_handlers = [h for h in logger.handlers
                            if isinstance(h, logging.handlers.RotatingFileHandler)]
-            
+
             assert len(file_handlers) == 1
             handler = file_handlers[0]
             assert handler.maxBytes == 1024
@@ -157,15 +150,13 @@ class TestLoggingIntegration:
 
     def test_logging_in_config_module(self):
         """Test that config module can use logging."""
-        from python_magnetsetup.config import appenv
-        
+
         # Should not raise any errors
         logger = get_logger('python_magnetsetup.config')
         assert isinstance(logger, logging.Logger)
 
     def test_logging_in_file_utils(self):
         """Test that file_utils module can use logging."""
-        from python_magnetsetup.file_utils import findfile
-        
+
         logger = get_logger('python_magnetsetup.file_utils')
         assert isinstance(logger, logging.Logger)

@@ -24,8 +24,11 @@ mustache templates
 # TODO check for unit consistency
 # depending on Length base unit
 
-import os
 import itertools
+import os
+
+# from .units import load_units, convert_data
+from glob import glob
 
 # Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Insert import Insert
@@ -35,32 +38,26 @@ import itertools
 # from python_magnetgeo.Supras import Supras
 # from python_magnetgeo.Bitter import Bitter
 # from python_magnetgeo.Supra import Supra
-
 # from .config import appenv
-from typing import Any, Optional
+from typing import Any
+
+from .bitter import Bitter_setup
+from .cfg import create_cfg
 from .config import appenv, loadconfig, loadtemplates
+from .file_utils import MyOpen, findfile, search_paths
+from .insert import Insert_setup, Insert_simfile
+from .jsonmodel import create_json
+
+# logging
+from .logging_config import get_logger
+from .node import NodeSpec
 
 # from .objects import load_object, load_object_from_db
 from .objects import load_object
-from .utils import NMerge
-from .cfg import create_cfg
-from .jsonmodel import create_json
-
-from .insert import Insert_setup, Insert_simfile
-from .bitter import Bitter_setup
 
 # from .bitter import Bitter_simfile
 from .supra import Supra_setup, Supra_simfile
-
-from .file_utils import MyOpen, findfile, search_paths
-
-# from .units import load_units, convert_data
-from glob import glob
-
-from .node import NodeSpec
-
-# logging
-from .logging_config import setup_logging, get_logger, init_default_logging
+from .utils import NMerge
 
 logger = get_logger(__name__)
 
@@ -71,7 +68,7 @@ def magnet_simfile(
     cad: Any,
     addAir: bool = False,
     debug: bool = False,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> list[str]:
     """
     Create simulation files for a magnet.
@@ -84,8 +81,8 @@ def magnet_simfile(
     :param session: Optional database session.
     :return: List of simulation file paths.
     """
-    from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Supras import Supras
 
     files = []
@@ -142,8 +139,8 @@ def magnet_setup(
     :param debug: Enable debug output.
     :return: Tuple of (mdict, mmat, mmodels, mpost) setup dicts.
     """
-    from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Insert import Insert
     from python_magnetgeo.Supras import Supras
 
     print(f"magnet_setup: mname={mname}")
@@ -324,7 +321,7 @@ def assembly_simfile(
     confdata: str,
     cad: Any,
     addAir: bool = False,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> list[str]:
     """
     Create list of simulation files for an Assembly.
@@ -371,7 +368,7 @@ def assembly_setup(
     templates: dict,
     currents: dict,
     debug: bool = False,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> tuple[dict, dict, dict, dict]:
     """
     Create setup dicts for an Assembly.
@@ -463,7 +460,7 @@ def setup(
     confdata: dict,
     jsonfile: str,
     currents: dict,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> tuple[str, str, str, str, str, list]:
     """
     Generate simulation files for a magnet or site.
@@ -476,8 +473,8 @@ def setup(
     :param session: Optional database session.
     :return: Tuple of (yamlfile, cfgfile, jsonfile, xaofile, meshfile, csvfiles).
     """
-    from python_magnetgeo.utils import getObject
     import python_magnetgeo as pmg
+    from python_magnetgeo.utils import getObject
 
     # Register YAML constructors for lazy loading
     pmg.verify_class_registration()
@@ -656,7 +653,7 @@ def commissioning_setup(
     confdata: dict,
     jsonfile: str,
     currents: dict,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> dict:
     """
     Generate simulation files for commissioning runs.
@@ -686,7 +683,7 @@ def commissioning_setup(
     print(f"commissioning_setup/main: {os.getcwd()}")
 
     if args.geom == "3D":
-        raise RuntimeError(f"commissioning_setup for 3D geometries not implemented yet")
+        raise RuntimeError("commissioning_setup for 3D geometries not implemented yet")
 
     # call setup for several scenario corresponding to cooling
     heatcorrelations = [args.hcorrelation]
@@ -864,7 +861,7 @@ def setup_cmds(
         cmds["Partition"] = f"singularity exec {simage_path}/{feelpp} {partcmd} --dim 2"
         meshfile = h5file
 
-    update_cfgmesh = f"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
+    update_cfgmesh = rf"perl -pi -e 's|mesh.filename=.*|mesh.filename=\$cfgdir/data/geometries/{meshfile}|' {cfgfile}"
     cmds["Update_Mesh"] = update_cfgmesh
 
     # TODO add command to change mesh.filename in cfgfile

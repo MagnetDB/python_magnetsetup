@@ -1,9 +1,8 @@
-import sys
-import os
 import json
-import yaml
+import os
 
 from .config import appenv
+
 
 def load_object(appenv: appenv, datafile: str, debug: bool = False):
     """
@@ -15,7 +14,7 @@ def load_object(appenv: appenv, datafile: str, debug: bool = False):
     else:
         print("Look for %s in workingdir %s" % (datafile, os.getcwd()))
 
-    with open(datafile, 'r') as cfgdata:
+    with open(datafile) as cfgdata:
             confdata = json.load(cfgdata)
     return confdata
 

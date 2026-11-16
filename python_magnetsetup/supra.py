@@ -1,28 +1,23 @@
-import os
-import yaml
 import copy
 import re
 
+from .file_utils import MyOpen, search_paths
+
 # Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Supra import Supra
-
 from .jsonmodel import (
-    create_params_supra,
     create_bcs_supra,
     create_materials_supra,
     create_models_supra,
+    create_params_supra,
 )
-from .utils import NMerge
-
-from .file_utils import MyOpen, findfile, search_paths
-
 from .logging_config import get_logger
+from .utils import NMerge
 
 logger = get_logger(__name__)
 
 
 def Supra_simfile(MyEnv, confdata: dict, cad, debug: bool = False):
-    from python_magnetgeo.Supra import Supra
 
     print(f"Supra_simfile: cad={cad.name}")
     print(f"Supra_simfile: confdata={confdata}")
@@ -33,7 +28,7 @@ def Supra_simfile(MyEnv, confdata: dict, cad, debug: bool = False):
     with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as f:
         files.append(f.name)
 
-    if not cad.detail is None:
+    if cad.detail is not None:
         structfile = cad.struct
         with MyOpen(structfile, "r", paths=search_paths(MyEnv, "geom")) as f:
             files.append(f.name)
@@ -51,7 +46,6 @@ def Supra_setup(
     current: float = 31.0e3,
     debug: bool = False,
 ):
-    from python_magnetgeo.Supra import Supra
 
     print(f"Supra_setup: magnet={mname}, cad={cad.name}")
     part_thermic = []
@@ -111,8 +105,8 @@ def Supra_setup(
     if method_data[2] == "Axi" and (
         "el" in method_data[3] and method_data[3] != "thelec"
     ):
-        boundary_meca.append("{}_V0".format(name))
-        boundary_meca.append("{}_V1".format(name))
+        boundary_meca.append(f"{name}_V0")
+        boundary_meca.append(f"{name}_V1")
 
         boundary_maxwell.append("ZAxis")
         boundary_maxwell.append("Infty")
@@ -183,7 +177,7 @@ def Supra_setup(
     Stress_data = []
     VonMises_data = []
 
-    from .units import load_units, convert_data
+    from .units import convert_data, load_units
 
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)
@@ -219,7 +213,6 @@ def Supra_setup(
 
     print(f"{mname}: Update Js for I0={current}A")
     if method_data[2] == "Axi":
-        import math
 
         params = params_data["Parameters"]
         # Js= I0*Nturns/Area where Nturns and Area depend on detail

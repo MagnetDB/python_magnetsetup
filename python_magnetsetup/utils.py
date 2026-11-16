@@ -1,4 +1,3 @@
-import itertools
 
 from .logging_config import get_logger
 

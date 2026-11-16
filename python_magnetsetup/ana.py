@@ -1,25 +1,24 @@
 """Console script for linking python_magnetsetup and python_magnettoos."""
 
-import sys
-import os
-import json
-import yaml
-import math
-
 import argparse
+import math
+import os
+import sys
 
-# from .objects import load_object, load_object_from_db
-from .objects import load_object
-from .config import appenv, loadconfig, loadtemplates
+import yaml
 
-
+from .config import appenv, loadconfig
 from .file_utils import MyOpen, findfile, search_paths
 from .logging_config import get_logger
 
+# from .objects import load_object, load_object_from_db
+from .objects import load_object
+
 logger = get_logger(__name__)
 
+from typing import Any
+
 import magnettools.magnettools as mt
-from typing import Any, Optional
 
 
 def HMagnet(
@@ -104,7 +103,6 @@ def BMagnet(
     :param debug: Enable debug output.
     :return: ``mt.VectorOfBitters`` containing one element per turn group.
     """
-    from python_magnetgeo.Bitter import Bitter
 
     BMagnets = mt.VectorOfBitters()
 
@@ -143,7 +141,6 @@ def UMagnet(struct: Any, debug: bool = False) -> Any:
     :param debug: Enable debug output.
     :return: A single :class:`mt.UnifMagnet` instance.
     """
-    from python_magnetgeo.Supra import Supra
 
     rho = 0
     f = struct.getFillingFactor()
@@ -180,7 +177,6 @@ def UMagnets(
     :param debug: Enable debug output.
     :return: ``mt.VectorOfUnifs`` containing one element per sub-unit.
     """
-    from python_magnetgeo.SupraStructure import HTSInsert
 
     rho = 0
     UMagnets = mt.VectorOfUnifs()
@@ -252,11 +248,11 @@ def magnet_setup(
         as ``(VectorOfTubes, VectorOfBitters, VectorOfBitters,
         VectorOfBitters, VectorOfUnifs, VectorOfShims)``.
     """
-    from python_magnetgeo.utils import getObject
-    from python_magnetgeo.Insert import Insert
-    from python_magnetgeo.Bitters import Bitters
-    from python_magnetgeo.Supras import Supras
     import python_magnetgeo as pmg
+    from python_magnetgeo.Bitters import Bitters
+    from python_magnetgeo.Insert import Insert
+    from python_magnetgeo.Supras import Supras
+    from python_magnetgeo.utils import getObject
 
     # Register YAML constructors for lazy loading
     pmg.verify_class_registration()
@@ -399,7 +395,7 @@ def setup(
     args: Any,
     confdata: dict,
     jsonfile: str,
-    session: Optional[Any] = None,
+    session: Any | None = None,
 ) -> tuple[Any, Any, Any, Any, Any, Any]:
     """
     Entry-point for the MagnetTools setup workflow.

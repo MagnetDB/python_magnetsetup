@@ -1,6 +1,6 @@
 """Top-level package for Python Magnet SetUp."""
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 __author__ = """Christophe Trophime"""
 __email__ = "christophe.trophime@lncmi.cnrs.fr"
@@ -12,7 +12,7 @@ except PackageNotFoundError:
     __version__ = "0.0.0.dev0"
 
 # Import logging utilities
-from .logging_config import setup_logging, get_logger, init_default_logging
+from .logging_config import get_logger, init_default_logging, setup_logging
 
 # Use lazy loading pattern for python_magnetgeo
 # Only import for version checking

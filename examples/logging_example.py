@@ -5,7 +5,7 @@ Example script demonstrating logging usage in python_magnetsetup.
 This script shows different ways to configure and use logging.
 """
 
-from python_magnetsetup import setup_logging, get_logger
+from python_magnetsetup import get_logger, setup_logging
 from python_magnetsetup.config import appenv
 
 # Example 1: Using default logging (already initialized)

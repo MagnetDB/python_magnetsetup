@@ -8,7 +8,7 @@ def entry_cfg(template: str, rdata: dict, debug: bool = False) -> str:
 
     logger.debug("entry/loading %s" % str(template))
     logger.debug("entry/rdata:", rdata)
-    with open(template, "r") as f:
+    with open(template) as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("'", '"')
     return jsonfile

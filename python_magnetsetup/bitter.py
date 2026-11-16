@@ -1,32 +1,26 @@
-import yaml
 import copy
+
+from .file_utils import MyOpen, search_paths
 
 # Use lazy loading pattern for python_magnetgeo
 # from python_magnetgeo.Bitter import Bitter
-
 from .jsonmodel import (
-    create_params_bitter,
-    create_params_csvfiles_bitter,
     create_bcs_bitter,
     create_materials_bitter,
     create_models_bitter,
+    create_params_bitter,
+    create_params_csvfiles_bitter,
 )
-from .utils import Merge, NMerge
-
-import os
-
-from .file_utils import MyOpen, findfile, search_paths
 from .logging_config import get_logger
+from .utils import NMerge
 
 logger = get_logger(__name__)
 
 
 def Bitter_simfile(MyEnv, confdata: dict, cad, debug: bool = False):
-    from python_magnetgeo.Bitter import Bitter
 
     print(f"Bitter_simfile: cad={cad.name}")
 
-    from .file_utils import MyOpen, findfile
 
     yamlfile = confdata["geom"]
     with MyOpen(yamlfile, "r", paths=search_paths(MyEnv, "geom")) as cfgdata:
@@ -43,7 +37,6 @@ def Bitter_setup(
     current: float = 31.0e3,
     debug: bool = False,
 ):
-    from python_magnetgeo.Bitter import Bitter
 
     print(f"Bitter_setup: magnet={mname}, cad={cad.name}")
     logger.debug(f"Bitter_setup/Bitter confdata: {confdata}")
@@ -227,7 +220,7 @@ def Bitter_setup(
     Stress_data = []
     VonMises_data = []
 
-    from .units import load_units, convert_data
+    from .units import convert_data, load_units
 
     unit_Length = method_data[5]  # "meter"
     units = load_units(unit_Length)

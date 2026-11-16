@@ -3,12 +3,11 @@ Json file
 """
 
 import json
-
 import math
 
-from .utils import Merge
-from .units import load_units, convert_data
 from .logging_config import get_logger
+from .units import convert_data, load_units
+from .utils import Merge
 
 logger = get_logger(__name__)
 
@@ -1105,15 +1104,7 @@ def create_bcs_insert(
             return Merge(th_, elec_)
     elif method_data[3] == "mag" or method_data[3] == "mag_hcurl":
         return maxwell_bcs_dir
-    elif method_data[3] == "thmag" or method_data[3] == "thmag_hcurl":
-        th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
-        if method_data[2] == "Axi":
-            return Merge(maxwell_bcs_dir, th_)
-        else:
-            elec_ = Merge(electric_bcs_dir, electric_bcs_neu)
-            thelec_ = Merge(th_, elec_)
-            return Merge(maxwell_bcs_dir, thelec_)
-    elif method_data[3] == "thmqs" or method_data[3] == "thmqs_hcurl":
+    elif method_data[3] == "thmag" or method_data[3] == "thmag_hcurl" or method_data[3] == "thmqs" or method_data[3] == "thmqs_hcurl":
         th_ = Merge(thermic_bcs_rob, thermic_bcs_neu)
         if method_data[2] == "Axi":
             return Merge(maxwell_bcs_dir, th_)
@@ -1263,12 +1254,13 @@ def create_json(
 
 
 def entry(template: str, rdata: list, debug: bool = False) -> str:
-    import chevron
     import re
+
+    import chevron
 
     logger.debug("entry/loading %s", str(template))
     logger.debug("entry/rdata: %s", rdata)
-    with open(template, "r") as f:
+    with open(template) as f:
         jsonfile = chevron.render(f, rdata)
     jsonfile = jsonfile.replace("'", '"')
     # print("jsonfile:", jsonfile)

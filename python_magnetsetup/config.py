@@ -2,6 +2,7 @@ import json
 import os
 
 from decouple import Config, RepositoryEnv
+
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -82,7 +83,7 @@ def loadconfig():
     """
 
     default_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(default_path, "magnetsetup.json"), "r") as appcfg:
+    with open(os.path.join(default_path, "magnetsetup.json")) as appcfg:
         magnetsetup = json.load(appcfg)
     return magnetsetup
 
@@ -185,13 +186,13 @@ def check_templates(templates: dict):
     for key in templates:
         if isinstance(templates[key], str):
             print(f"{key}: {templates[key]}")
-            with open(templates[key], "r"):
+            with open(templates[key]):
                 pass
 
         elif isinstance(templates[key], str):
             for s in templates[key]:
                 print(f"{key}: {s}")
-                with open(s, "r"):
+                with open(s):
                     pass
     print("==========================")
 

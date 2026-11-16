@@ -56,41 +56,41 @@ def setup_logging(
         level = getattr(logging, level_str, logging.INFO)
     elif isinstance(level, str):
         level = getattr(logging, level.upper(), logging.INFO)
-    
+
     # Get log file from environment if not specified
     if log_file is None:
         log_file = os.environ.get('MAGNETSETUP_LOG_FILE')
-    
+
     # Default formats
     if log_format is None:
         log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    
+
     if date_format is None:
         date_format = '%Y-%m-%d %H:%M:%S'
-    
+
     # Create formatter
     formatter = logging.Formatter(log_format, datefmt=date_format)
-    
+
     # Get root logger
     root_logger = logging.getLogger('python_magnetsetup')
     root_logger.setLevel(level)
-    
+
     # Remove existing handlers to avoid duplicates
     root_logger.handlers.clear()
-    
+
     # Console handler
     if console:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(level)
         console_handler.setFormatter(formatter)
         root_logger.addHandler(console_handler)
-    
+
     # File handler
     if log_file:
         log_path = Path(log_file)
         # Create parent directory if it doesn't exist
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Use rotating file handler to prevent unlimited growth
         file_handler = logging.handlers.RotatingFileHandler(
             log_path,
@@ -101,10 +101,10 @@ def setup_logging(
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
-    
+
     # Prevent propagation to root logger to avoid duplicate logs
     root_logger.propagate = False
-    
+
     return root_logger
 
 
@@ -125,7 +125,7 @@ def get_logger(name):
     # Ensure the logger is a child of python_magnetsetup
     if not name.startswith('python_magnetsetup'):
         name = f'python_magnetsetup.{name}'
-    
+
     return logging.getLogger(name)
 
 
